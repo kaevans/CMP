@@ -12,7 +12,7 @@ namespace CMP.Functions
 {
     public static class RepoEventsFunction
     {
-        [FunctionName("Function1")]
+        [FunctionName("RepoEvents")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
