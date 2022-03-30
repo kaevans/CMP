@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using Microsoft.Extensions.Options;
 using CMP.Functions.Models;
 using CMP.Functions.Services;
-using System.Runtime.CompilerServices;
+using CMPGitRepository = CMP.Functions.Models.GitRepository;
 
 namespace CMP.Functions
 {
@@ -34,19 +34,41 @@ namespace CMP.Functions
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
-            _logger.LogInformation(_options.PersonalAccessToken);
-            string name = req.Query["name"];
+            try
+            {
+                _logger.LogInformation("Service Hook Received.");
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+                // Get request body
+                var data = await req.ReadAsStringAsync();
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+                _logger.LogInformation("Data Received: " + data);
 
-            return new OkObjectResult(responseMessage);
+                // Get the pull request object from the service hooks payload
+                dynamic jObject = JsonConvert.DeserializeObject(data);
+
+                // Get the pull request id
+                int pullRequestId;
+                if (!Int32.TryParse(jObject.resource.pullRequestId.ToString(), out pullRequestId))
+                {
+                    _logger.LogWarning("Failed to parse the pull request id from the service hooks payload.");
+                };
+
+                // Get the pull request title
+                string pullRequestTitle = jObject.resource.pullRequestTitle;
+
+                _logger.LogInformation("Service Hook Received for PR: " + pullRequestId + " " + pullRequestTitle);
+
+                var ret = new CMPGitRepository { Id = jObject.resource.repository.Id, Name = jObject.resource.repository.Name };
+
+                _logger.LogInformation("Id:{0}, Name:{1}", ret.Id, ret.Name);
+                return new OkObjectResult(ret);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.ToString());
+
+                return new BadRequestObjectResult(ex.ToString());
+            }
         }
     }
 }

@@ -24,12 +24,7 @@ namespace CMP.Functions.Services
         }
         public async Task<CMPGitRepository> GetRepository()
         {
-
-            //TODO: Get personal access token from Key Vault
-            string personalAccessToken = "";
-
-
-            var creds = new VssBasicCredential(string.Empty, personalAccessToken);
+            var creds = new VssBasicCredential(string.Empty, _options.PersonalAccessToken);
 
             // Connect to Azure DevOps Services
             var connection = new VssConnection(new Uri(_options.GetOrganizationUri()), creds);
@@ -40,10 +35,13 @@ namespace CMP.Functions.Services
             // Get data about a specific repository
             var repo = await gitClient.GetRepositoryAsync(_options.Project, _options.Repository);
 
+            
             return new CMPGitRepository
             {
                 Name = repo.Name,
-                Url = repo.Url
+                Id = repo.Url,
+                WebUrl = repo.WebUrl,
+                RemoteUrl = repo.RemoteUrl
             };
         }
     }
