@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subscriptionId": {
+      "value": "d43f9b10-9c66-43f8-a701-afc0ad123cfd"
+    },
+    "name": {
+      "value": "repoevents"
+    },
+    "location": {
+      "value": "Central US"
+    },
+    "hostingPlanName": {
+      "value": "ASP-rgcmp-b0b4"
+    },
+    "serverFarmResourceGroup": {
+      "value": "rg-cmp"
+    },
+    "alwaysOn": {
+      "value": false
+    },
+    "use32BitWorkerProcess": {
+      "value": true
+    },
+    "storageAccountName": {
+      "value": "rgcmp848f"
+    },
+    "netFrameworkVersion": {
+      "value": "v6.0"
+    },
+    "sku": {
+      "value": "Dynamic"
+    },
+    "skuCode": {
+      "value": "Y1"
+    },
+    "workerSize": {
+      "value": "0"
+    },
+    "workerSizeId": {
+      "value": "0"
+    },
+    "numberOfWorkers": {
+      "value": "1"
+    }
+  }
+}
