@@ -1,4 +1,5 @@
-﻿using CMP.Functions.Models;
+﻿using CMP.Core.Interfaces;
+using CMP.Functions.Options;
 using CMP.Functions.Services;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;

@@ -1,7 +1,6 @@
-﻿using CMP.Functions.Models;
-using System.Threading.Tasks;
+﻿using CMP.Core.Models;
 
-namespace CMP.Functions.Services
+namespace CMP.Core.Interfaces
 {
     public interface IGitRepositoryService
     {

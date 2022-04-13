@@ -1,4 +1,5 @@
-﻿using CMP.Functions.Models;
+﻿using CMP.Core.Interfaces;
+using CMP.Functions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
@@ -6,7 +7,7 @@ using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.Threading.Tasks;
-using CMPGitRepository = CMP.Functions.Models.GitRepository;
+using CMPGitRepository = CMP.Core.Models.GitRepository;
 
 namespace CMP.Functions.Services
 {

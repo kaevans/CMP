@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CMP.Functions.Models
+namespace CMP.Core.Models
 {
+
     public class GitRepository
     {
         public string Name { get; set; }

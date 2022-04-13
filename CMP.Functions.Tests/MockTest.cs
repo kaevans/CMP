@@ -1,16 +1,14 @@
-﻿using CMP.Functions;
-using CMP.Functions.Models;
-using CMP.Functions.Services;
-using Microsoft.AspNetCore.Http.Features;
+﻿using CMP.Core.Interfaces;
+using CMP.Functions.Options;
+using CMP.Functions.Tests.Core;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Diagnostics;
 using System.Dynamic;
-using CMPGitRepository = CMP.Functions.Models.GitRepository;
+using CMPGitRepository = CMP.Core.Models.GitRepository;
 
 namespace CMP.Functions.Tests
 {
