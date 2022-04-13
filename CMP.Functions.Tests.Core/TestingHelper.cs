@@ -1,16 +1,14 @@
-﻿using CMP.Functions.Models;
+﻿using CMP.Functions.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
-using System;
 using System.Diagnostics;
-using System.IO;
 
-namespace CMP.Functions.Tests
+namespace CMP.Functions.Tests.Core
 {
-    internal static class TestingHelper
+    public static class TestingHelper
     {
         public static Mock<ILogger<T>> GetLogger<T>()
         {
@@ -42,7 +40,7 @@ namespace CMP.Functions.Tests
         public static Mock<HttpRequest> CreateMockRequestWithJson(string json)
         {
             var ms = new MemoryStream();
-            var sw = new StreamWriter(ms);            
+            var sw = new StreamWriter(ms);
 
             sw.Write(json);
             sw.Flush();
@@ -67,7 +65,7 @@ namespace CMP.Functions.Tests
             //TODO: Validte if the usersecrets.json GUID changes
             return new ConfigurationBuilder()
                 .SetBasePath(outputPath)
-                .AddJsonFile("appsettings.json", optional: true)      
+                .AddJsonFile("appsettings.json", optional: true)
                 .AddUserSecrets("6ff51d39-4e90-49a1-80f0-e5df0c104c57")
                 .AddEnvironmentVariables()
                 .Build();

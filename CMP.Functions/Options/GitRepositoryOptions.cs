@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CMP.Functions.Models
+﻿namespace CMP.Functions.Options
 {
     public class GitRepositoryOptions
     {

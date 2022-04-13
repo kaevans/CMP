@@ -1,16 +1,13 @@
-using CMP.Functions;
-using CMP.Functions.Models;
+
+using CMP.Functions.Options;
 using CMP.Functions.Services;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
+using CMP.Functions.Tests.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using CMPGitRepository = CMP.Functions.Models.GitRepository;
+using CMPGitRepository = CMP.Core.Models.GitRepository;
 
-
-namespace CMP.Functions.Tests
+namespace CMP.Functions.Integration.Tests
 {
     [TestClass]
     public class IntegrationTest
@@ -32,7 +29,7 @@ namespace CMP.Functions.Tests
             var serviceProvider = services.BuildServiceProvider();
 
             // to use (or store in )
-            OptionsConfig = serviceProvider.GetRequiredService<IOptions<GitRepositoryOptions>>();            
+            OptionsConfig = serviceProvider.GetRequiredService<IOptions<GitRepositoryOptions>>();
         }
 
         [TestMethod]
@@ -49,12 +46,12 @@ namespace CMP.Functions.Tests
 
             var result = service.GetRepository().GetAwaiter().GetResult();
 
-            
+
             Assert.IsTrue(result is CMPGitRepository);
             Assert.IsNotNull(result);
 
-            
-            Assert.AreEqual(result.Name, expected.Name);                                    
+
+            Assert.AreEqual(result.Name, expected.Name);
 
         }
 
