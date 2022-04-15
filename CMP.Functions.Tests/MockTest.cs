@@ -1,6 +1,8 @@
 ﻿using CMP.Core.Interfaces;
-using CMP.Functions.Options;
+using CMP.Core.Models;
 using CMP.Functions.Tests.Core;
+using CMP.Infrastructure.Data;
+using CMP.Infrastructure.Git;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -40,7 +42,7 @@ namespace CMP.Functions.Tests
         [TestMethod]
         public void TestFunctionReturnsValidRepo()
         {
-            var mockService = new Mock<IGitRepositoryService>();
+            var mockService = new Mock<IGitRepository>();
 
             dynamic requestBody = new ExpandoObject();
             dynamic resource = new ExpandoObject();
@@ -52,7 +54,8 @@ namespace CMP.Functions.Tests
             requestBody.resource = resource;
             requestBody.resource.repository = repository;
 
-          
+            var mockCosmosDbService = new Mock<ICosmosDbRepository<DeploymentTemplate>>();
+            
             var expected = new CMPGitRepository { Id = requestBody.resource.repository.Id, Name = requestBody.resource.repository.Name };
             
                  
@@ -62,7 +65,7 @@ namespace CMP.Functions.Tests
             mockService.Setup(x => x.GetRepository()).ReturnsAsync(expected);
             
 
-            var functionUnderTest = new RepoEventsFunction(mockLoggerFunction.Object, OptionsConfig, mockService.Object);
+            var functionUnderTest = new RepoEventsFunction(mockLoggerFunction.Object, OptionsConfig, mockService.Object, mockCosmosDbService.Object);
 
             var result = functionUnderTest.Run(mockRequest.Object).GetAwaiter().GetResult();            
 

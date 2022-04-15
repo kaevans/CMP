@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 namespace CMP.Core.Models
 {
 
-    public class GitRepository
+    public class GitRepository : Entity
     {
         public string Name { get; set; }
-        public string Id { get; set; }
+        
         public string Url { get; set; }
         public string RemoteUrl { get; set; }
         public string WebUrl { get; set; }
+        
     }
 }
