@@ -1,5 +1,7 @@
 using CMP.Core.Interfaces;
-using CMP.Functions.Options;
+using CMP.Core.Models;
+using CMP.Infrastructure.Data;
+using CMP.Infrastructure.Git;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -17,15 +19,19 @@ namespace CMP.Functions
     {
         private readonly ILogger<RepoEventsFunction> _logger;
         private readonly GitRepositoryOptions _options;
-        private readonly IGitRepositoryService _gitRepositoryService;
+        private readonly IGitRepository _gitRepositoryService;
+        private readonly ICosmosDbRepository<DeploymentTemplate> _cosmosDbRepositoryService;
 
         public RepoEventsFunction(ILogger<RepoEventsFunction> logger, 
             IOptions<GitRepositoryOptions> options,
-            IGitRepositoryService gitRepositoryService)
+            IGitRepository gitRepositoryService,
+            ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService
+            )
         {
             _logger = logger;
             _options = options.Value;
             _gitRepositoryService = gitRepositoryService;
+            _cosmosDbRepositoryService = cosmosDbRepositoryService; 
         }
 
 
@@ -60,6 +66,7 @@ namespace CMP.Functions
                 var ret = new CMPGitRepository { Id = jObject.resource.repository.Id, Name = jObject.resource.repository.Name };
 
                 _logger.LogInformation("Id:{0}, Name:{1}", ret.Id, ret.Name);
+
                 return new OkObjectResult(ret);
             }
             catch (Exception ex)

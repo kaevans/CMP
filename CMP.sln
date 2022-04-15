@@ -11,9 +11,13 @@ Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "CMP.Deployment", "CMP.Deplo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMP.Core", "CMP.Core\CMP.Core.csproj", "{EBB74F88-76AF-46AC-9684-9AB809089E8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMP.Functions.Tests.Integration", "CMP.Functions.Integration.Tests\CMP.Functions.Tests.Integration.csproj", "{49A984E5-D9FF-490C-886B-46FD35F2261A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMP.Functions.Tests.Integration", "CMP.Functions.Integration.Tests\CMP.Functions.Tests.Integration.csproj", "{49A984E5-D9FF-490C-886B-46FD35F2261A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMP.Functions.Tests.Core", "CMP.Functions.Tests.Core\CMP.Functions.Tests.Core.csproj", "{8469573F-1F04-40FA-8645-EF50DAA534C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMP.Functions.Tests.Core", "CMP.Functions.Tests.Core\CMP.Functions.Tests.Core.csproj", "{8469573F-1F04-40FA-8645-EF50DAA534C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMP.Infrastructure.Tests.Unit", "CMP.Infrastructure.Tests.Unit\CMP.Infrastructure.Tests.Unit.csproj", "{5322B4CE-9B60-4FD1-B43E-23968D74322F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMP.Infrastructure", "CMP.Infrastructure\CMP.Infrastructure.csproj", "{47AA91A3-3542-4142-8D42-2FE0A038AC9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,14 @@ Global
 		{8469573F-1F04-40FA-8645-EF50DAA534C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8469573F-1F04-40FA-8645-EF50DAA534C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8469573F-1F04-40FA-8645-EF50DAA534C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5322B4CE-9B60-4FD1-B43E-23968D74322F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5322B4CE-9B60-4FD1-B43E-23968D74322F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5322B4CE-9B60-4FD1-B43E-23968D74322F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5322B4CE-9B60-4FD1-B43E-23968D74322F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47AA91A3-3542-4142-8D42-2FE0A038AC9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47AA91A3-3542-4142-8D42-2FE0A038AC9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47AA91A3-3542-4142-8D42-2FE0A038AC9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47AA91A3-3542-4142-8D42-2FE0A038AC9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,8 +1,8 @@
 ﻿using CMP.Core.Models;
 
-namespace CMP.Core.Interfaces
+namespace CMP.Infrastructure.Git
 {
-    public interface IGitRepositoryService
+    public interface IGitRepository
     {
         Task<GitRepository> GetRepository();
     }

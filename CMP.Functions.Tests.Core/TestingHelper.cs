@@ -1,4 +1,5 @@
-﻿using CMP.Functions.Options;
+﻿using CMP.Infrastructure.Data;
+using CMP.Infrastructure.Git;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -66,7 +67,7 @@ namespace CMP.Functions.Tests.Core
             return new ConfigurationBuilder()
                 .SetBasePath(outputPath)
                 .AddJsonFile("appsettings.json", optional: true)
-                .AddUserSecrets("6ff51d39-4e90-49a1-80f0-e5df0c104c57")
+                .AddUserSecrets("426bd3ab-8222-415e-977d-6529dafc9f78")
                 .AddEnvironmentVariables()
                 .Build();
         }
@@ -78,6 +79,17 @@ namespace CMP.Functions.Tests.Core
             var iConfig = GetIConfigurationRoot(outputPath);
 
             iConfig.GetSection(GitRepositoryOptions.SectionName).Bind(configuration);
+
+            return configuration;
+        }
+
+        public static CosmosDbOptions GetCosmosDBConfiguration(string outputPath)
+        {
+            var configuration = new CosmosDbOptions();
+
+            var iConfig = GetIConfigurationRoot(outputPath);
+
+            iConfig.GetSection(CosmosDbOptions.SectionName).Bind(configuration);
 
             return configuration;
         }
