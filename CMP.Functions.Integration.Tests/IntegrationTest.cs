@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using CMPGitRepository = CMP.Core.Models.GitRepository;
 
-namespace CMP.Functions.Integration.Tests
+namespace CMP.Infrastructure.Tests.Integration
 {
     [TestClass]
     public class IntegrationTest

@@ -11,7 +11,7 @@ Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "CMP.Deployment", "CMP.Deplo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMP.Core", "CMP.Core\CMP.Core.csproj", "{EBB74F88-76AF-46AC-9684-9AB809089E8F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMP.Functions.Tests.Integration", "CMP.Functions.Integration.Tests\CMP.Functions.Tests.Integration.csproj", "{49A984E5-D9FF-490C-886B-46FD35F2261A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMP.Infrastructure.Tests.Integration", "CMP.Functions.Integration.Tests\CMP.Infrastructure.Tests.Integration.csproj", "{49A984E5-D9FF-490C-886B-46FD35F2261A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMP.Functions.Tests.Core", "CMP.Functions.Tests.Core\CMP.Functions.Tests.Core.csproj", "{8469573F-1F04-40FA-8645-EF50DAA534C2}"
 EndProject
