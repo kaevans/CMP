@@ -57,11 +57,8 @@ namespace CMP.Functions
                 {
                     _logger.LogWarning("Failed to parse the pull request id from the service hooks payload.");
                 };
-
-                // Get the pull request title
-                string pullRequestTitle = jObject.resource.pullRequestTitle;
-
-                _logger.LogInformation("Service Hook Received for PR: " + pullRequestId + " " + pullRequestTitle);
+                                
+                _logger.LogInformation("Service Hook Received for PR: " + pullRequestId);
 
                 var ret = new CMPGitRepository { Id = jObject.resource.repository.Id, Name = jObject.resource.repository.Name };
 
