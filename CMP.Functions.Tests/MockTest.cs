@@ -17,7 +17,7 @@ namespace CMP.Functions.Tests
     [TestClass]
     public class MockTest
     {
-        private static IOptions<GitRepositoryOptions> OptionsConfig { get; set; }
+        private static IOptions<GitRepoOptions> OptionsConfig { get; set; }
 
         [ClassInitialize]
         public static void Init(TestContext testContext)
@@ -28,13 +28,13 @@ namespace CMP.Functions.Tests
             services.AddOptions();
 
             var configurationRoot = TestingHelper.GetIConfigurationRoot(testContext.DeploymentDirectory);
-            services.Configure<GitRepositoryOptions>(configurationRoot.GetSection(GitRepositoryOptions.SectionName));
+            services.Configure<GitRepoOptions>(configurationRoot.GetSection(GitRepoOptions.SectionName));
             
 
             var serviceProvider = services.BuildServiceProvider();
 
             // to use (or store in )
-            OptionsConfig = serviceProvider.GetRequiredService<IOptions<GitRepositoryOptions>>();
+            OptionsConfig = serviceProvider.GetRequiredService<IOptions<GitRepoOptions>>();
 
             Trace.WriteLine(OptionsConfig.Value.Organization);
         }
@@ -42,7 +42,7 @@ namespace CMP.Functions.Tests
         [TestMethod]
         public void TestFunctionReturnsValidRepo()
         {
-            var mockService = new Mock<IGitRepository>();
+            var mockService = new Mock<IGitRepoRepository<DeploymentTemplate>>();
 
             dynamic requestBody = new ExpandoObject();
             dynamic resource = new ExpandoObject();
@@ -62,25 +62,14 @@ namespace CMP.Functions.Tests
             var mockRequest = TestingHelper.CreateMockRequest(requestBody);
             var mockLoggerFunction = TestingHelper.GetLogger<RepoEventsFunction>();
 
-            mockService.Setup(x => x.GetRepository()).ReturnsAsync(expected);
+            mockService.Setup(x => x.GetRepositoryAsync()).ReturnsAsync(expected);
             
 
             var functionUnderTest = new RepoEventsFunction(mockLoggerFunction.Object, OptionsConfig, mockService.Object, mockCosmosDbService.Object);
 
             var result = functionUnderTest.Run(mockRequest.Object).GetAwaiter().GetResult();            
 
-            Assert.IsTrue(result is OkObjectResult);
-            if (result is OkObjectResult)
-            {
-                var resultObject = (OkObjectResult)result;
-                Assert.IsTrue(resultObject.Value is CMPGitRepository);
-                if(resultObject.Value is CMPGitRepository)
-                {
-                    var repo = (CMPGitRepository)resultObject.Value;
-                    Assert.IsTrue(repo.Name == expected.Name);
-                    Assert.IsTrue(repo.Id == expected.Id);
-                }                
-            }
+            Assert.IsTrue(result is OkResult);            
         }
 
     }

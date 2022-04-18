@@ -17,12 +17,12 @@ namespace CMP.Functions
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddOptions<GitRepositoryOptions>().Configure<IConfiguration>((settings, configuration) =>
+            builder.Services.AddOptions<GitRepoOptions>().Configure<IConfiguration>((settings, configuration) =>
             {
-                configuration.GetSection(GitRepositoryOptions.SectionName).Bind(settings);
+                configuration.GetSection(GitRepoOptions.SectionName).Bind(settings);
 
             });
-            builder.Services.AddSingleton<IGitRepository, AzureDevOpsGitRepositoryService>();
+            builder.Services.AddSingleton<IGitRepoRepository<DeploymentTemplate>, AzureDevOpsGitRepoRepository>();
             
             builder.Services.AddOptions<CosmosDbOptions>().Configure<IConfiguration>((settings, configuration) =>
             {

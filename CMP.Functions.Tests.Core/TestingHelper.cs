@@ -72,13 +72,13 @@ namespace CMP.Functions.Tests.Core
                 .Build();
         }
 
-        public static GitRepositoryOptions GetApplicationConfiguration(string outputPath)
+        public static GitRepoOptions GetApplicationConfiguration(string outputPath)
         {
-            var configuration = new GitRepositoryOptions();
+            var configuration = new GitRepoOptions();
 
             var iConfig = GetIConfigurationRoot(outputPath);
 
-            iConfig.GetSection(GitRepositoryOptions.SectionName).Bind(configuration);
+            iConfig.GetSection(GitRepoOptions.SectionName).Bind(configuration);
 
             return configuration;
         }
