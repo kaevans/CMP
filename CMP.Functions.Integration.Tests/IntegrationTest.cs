@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using CMPGitRepository = CMP.Core.Models.GitRepository;
 
 namespace CMP.Infrastructure.Tests.Integration
@@ -15,7 +16,7 @@ namespace CMP.Infrastructure.Tests.Integration
     [TestClass]
     public class IntegrationTest
     {
-        private static IOptions<GitRepositoryOptions> GitRepoOptions { get; set; }
+        private static IOptions<GitRepoOptions> GitRepoOptions { get; set; }
         private static IOptions<CosmosDbOptions> CosmosOptions { get; set; }
 
         [ClassInitialize]
@@ -27,13 +28,13 @@ namespace CMP.Infrastructure.Tests.Integration
             services.AddOptions();
 
             var configurationRoot = TestingHelper.GetIConfigurationRoot(testContext.DeploymentDirectory);
-            services.Configure<GitRepositoryOptions>(configurationRoot.GetSection(GitRepositoryOptions.SectionName));
+            services.Configure<GitRepoOptions>(configurationRoot.GetSection(Git.GitRepoOptions.SectionName));
             services.Configure<CosmosDbOptions>(configurationRoot.GetSection(CosmosDbOptions.SectionName));
 
             var serviceProvider = services.BuildServiceProvider();
 
             // to use (or store in )
-            GitRepoOptions = serviceProvider.GetRequiredService<IOptions<GitRepositoryOptions>>();
+            GitRepoOptions = serviceProvider.GetRequiredService<IOptions<GitRepoOptions>>();
             CosmosOptions = serviceProvider.GetRequiredService<IOptions<CosmosDbOptions>>();
 
 
@@ -45,8 +46,8 @@ namespace CMP.Infrastructure.Tests.Integration
         [TestMethod]
         public void TestServiceReturnsValidRepo()
         {
-            var logger = TestingHelper.GetLogger<AzureDevOpsGitRepositoryService>();
-            var service = new AzureDevOpsGitRepositoryService(GitRepoOptions, logger.Object);
+            var logger = TestingHelper.GetLogger<AzureDevOpsGitRepoRepository>();
+            var service = new AzureDevOpsGitRepoRepository(GitRepoOptions, logger.Object);
 
             var expected = new CMPGitRepository
             {
@@ -54,7 +55,7 @@ namespace CMP.Infrastructure.Tests.Integration
                 Name = GitRepoOptions.Value.Repository
             };
 
-            var result = service.GetRepository().GetAwaiter().GetResult();
+            var result = service.GetRepositoryAsync().GetAwaiter().GetResult();
 
 
             Assert.IsTrue(result is CMPGitRepository);
@@ -63,6 +64,18 @@ namespace CMP.Infrastructure.Tests.Integration
 
             Assert.AreEqual(result.Name, expected.Name);
 
+        }
+
+        [TestMethod]
+        public void TestDevOpsReturnsReadMeItems()
+        {
+            var logger = TestingHelper.GetLogger<AzureDevOpsGitRepoRepository>();
+            var service = new AzureDevOpsGitRepoRepository(GitRepoOptions, logger.Object);
+
+            var items = service.GetItemsAsync().GetAwaiter().GetResult();
+
+            Assert.IsNotNull(items);            
+            Assert.IsTrue(items.Count() > 0);
         }
 
         [TestMethod]
@@ -88,8 +101,14 @@ namespace CMP.Infrastructure.Tests.Integration
                 Description = "testing",
                 Id = Guid.NewGuid().ToString(),
                 Name = "testing",
-                ImageUrl = "testing",
-                Url = "testing"
+                Url = "testing",
+                Path = "testing",
+                ReadmeUrl = "testing",
+                DateUpdated = "testing",
+                GitUserName = "testing",
+                Schema = "testing",
+                Summary = "testing", 
+                Type = "testing"
             };
 
             Assert.IsNotNull(service);
@@ -102,7 +121,12 @@ namespace CMP.Infrastructure.Tests.Integration
             Assert.AreEqual(expected.Name, actual.Name);
             Assert.AreEqual(expected.Description, actual.Description);
             Assert.AreEqual(expected.Url, actual.Url);
-            Assert.AreEqual(expected.ImageUrl, actual.ImageUrl);
+            Assert.AreEqual(expected.ReadmeUrl, actual.ReadmeUrl);
+            Assert.AreEqual(expected.DateUpdated, actual.DateUpdated);
+            Assert.AreEqual(expected.GitUserName, actual.GitUserName);
+            Assert.AreEqual(expected.Schema, actual.Schema);
+            Assert.AreEqual(expected.Summary, actual.Summary);
+            Assert.AreEqual(expected.Type, actual.Type);
 
             //Clean up 
             service.DeleteAsync(actual).GetAwaiter().GetResult();

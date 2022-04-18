@@ -18,13 +18,13 @@ namespace CMP.Functions
     public class RepoEventsFunction
     {
         private readonly ILogger<RepoEventsFunction> _logger;
-        private readonly GitRepositoryOptions _options;
-        private readonly IGitRepository _gitRepositoryService;
+        private readonly GitRepoOptions _options;
+        private readonly IGitRepoRepository<DeploymentTemplate> _gitRepositoryService;
         private readonly ICosmosDbRepository<DeploymentTemplate> _cosmosDbRepositoryService;
 
         public RepoEventsFunction(ILogger<RepoEventsFunction> logger, 
-            IOptions<GitRepositoryOptions> options,
-            IGitRepository gitRepositoryService,
+            IOptions<GitRepoOptions> options,
+            IGitRepoRepository<DeploymentTemplate> gitRepositoryService,
             ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService
             )
         {
@@ -48,23 +48,15 @@ namespace CMP.Functions
 
                 _logger.LogInformation("Data Received: " + data);
 
-                // Get the pull request object from the service hooks payload
-                dynamic jObject = JsonConvert.DeserializeObject(data);
+                // Get all items from repository                
+                var items = await _gitRepositoryService.GetItemsAsync();
 
-                // Get the pull request id
-                int pullRequestId;
-                if (!Int32.TryParse(jObject.resource.pullRequestId.ToString(), out pullRequestId))
+                foreach (var item in items)
                 {
-                    _logger.LogWarning("Failed to parse the pull request id from the service hooks payload.");
-                };
-                                
-                _logger.LogInformation("Service Hook Received for PR: " + pullRequestId);
-
-                var ret = new CMPGitRepository { Id = jObject.resource.repository.Id, Name = jObject.resource.repository.Name };
-
-                _logger.LogInformation("Id:{0}, Name:{1}", ret.Id, ret.Name);
-
-                return new OkObjectResult(ret);
+                    await _cosmosDbRepositoryService.UpdateAsync(item);
+                }
+                
+                return new OkResult();
             }
             catch (Exception ex)
             {
