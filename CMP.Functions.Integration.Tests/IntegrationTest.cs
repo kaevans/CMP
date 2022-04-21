@@ -51,7 +51,6 @@ namespace CMP.Infrastructure.Tests.Integration
 
             var result = service.GetItemsAsync().GetAwaiter().GetResult();
 
-
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Count() > 0);            
 

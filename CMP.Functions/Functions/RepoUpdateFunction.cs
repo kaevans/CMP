@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace CMP.Functions
 {
-    public class RepoEventsFunction
+    public class RepoUpdateFunction
     {
-        private readonly ILogger<RepoEventsFunction> _logger;        
+        private readonly ILogger<RepoUpdateFunction> _logger;        
         private readonly IGitRepoRepository _gitRepositoryService;
         private readonly ICosmosDbRepository<DeploymentTemplate> _cosmosDbRepositoryService;
         private readonly IGitRepoItemRepositoryFactory<DeploymentTemplate> _gitRepoItemRepositoryFactory;
 
-        public RepoEventsFunction(ILogger<RepoEventsFunction> logger, 
+        public RepoUpdateFunction(ILogger<RepoUpdateFunction> logger, 
             IGitRepoRepository gitRepositoryService,
             IGitRepoItemRepositoryFactory<DeploymentTemplate> gitRepoItemRepositoryFactory,
             ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService
@@ -30,20 +30,14 @@ namespace CMP.Functions
             _cosmosDbRepositoryService = cosmosDbRepositoryService;
             _gitRepoItemRepositoryFactory = gitRepoItemRepositoryFactory;
         }
-
-
-        [FunctionName("RepoEvents")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req)
+        
+        [FunctionName("RepoUpdate")]
+        public async Task Run(
+            [TimerTrigger("0 0 */5 * * *")] TimerInfo myTimer)
         {
             try
-            {
-                _logger.LogInformation("Service Hook Received.");
-
-                // Get request body
-                var data = await req.ReadAsStringAsync();
-
-                _logger.LogInformation("Data Received: " + data);
+            {                
+                _logger.LogInformation("Timer trigger - Executed: {0}, Schedule:{1}, Next:{2}", DateTime.Now, myTimer.Schedule.ToString(), myTimer.Schedule.GetNextOccurrence(DateTime.Now).ToLocalTime());                
 
                 // Get all repositories from project                
                 var repoList = await _gitRepositoryService.GetItemsAsync();
@@ -58,13 +52,11 @@ namespace CMP.Functions
                     }                    
                 }
                 
-                return new OkResult();
+                
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.ToString());
-
-                return new BadRequestObjectResult(ex.ToString());
+                _logger.LogInformation(ex.ToString());                
             }
         }
     }

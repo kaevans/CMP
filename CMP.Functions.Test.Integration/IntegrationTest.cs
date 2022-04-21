@@ -61,8 +61,8 @@ namespace CMP.Functions.Test.Integration
             var mockFactoryLogger = TestingHelper.GetLogger<ADODeploymentTemplateRepositoryFactory>();
 
             var gitItemFactory = new ADODeploymentTemplateRepositoryFactory(mockFactoryLogger.Object, GitRepoOptions);
-            var mockFunctionLogger = TestingHelper.GetLogger<RepoEventsFunction>();
-            var functionUnderTest = new RepoEventsFunction(mockFunctionLogger.Object, gitService,gitItemFactory, cosmosService);
+            var mockFunctionLogger = TestingHelper.GetLogger<RepoUpdateFunction>();
+            var functionUnderTest = new RepoUpdateFunction(mockFunctionLogger.Object, gitService,gitItemFactory, cosmosService);
 
             var mockRequest = TestingHelper.CreateMockRequest(requestBody);
             var ret = functionUnderTest.Run(mockRequest.Object).GetAwaiter().GetResult();
