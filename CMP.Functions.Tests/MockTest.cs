@@ -4,6 +4,8 @@ using CMP.Functions.Tests.Core;
 using CMP.Infrastructure.Data;
 using CMP.Infrastructure.Git;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -39,31 +41,21 @@ namespace CMP.Functions.Tests
         }
 
         [TestMethod]
-        public void TestFunctionReturnsOkResult()
+        public void TestFunctionExecutesWithoutExceptions()
         {
             var mockService = new Mock<IGitRepoRepository>();
 
-            dynamic requestBody = new ExpandoObject();
-            dynamic resource = new ExpandoObject();
-            resource.pullRequestId = "1";
-            resource.pullRequestTitle = "demo title";
-            dynamic repository = new ExpandoObject();
-            repository.Id = "1";
-            repository.Name = "demo repo";
-            requestBody.resource = resource;
-            requestBody.resource.repository = repository;
-
             var mockCosmosDbService = new Mock<ICosmosDbRepository<DeploymentTemplate>>();
-                                                     
-            var mockRequest = TestingHelper.CreateMockRequest(requestBody);
-            var mockLoggerFunction = TestingHelper.GetLogger<RepoEventsFunction>();
+                                                                 
+            var mockLoggerFunction = TestingHelper.GetLogger<RepoUpdateFunction>();
 
             var mockFactory = new Mock<IGitRepoItemRepositoryFactory<DeploymentTemplate>>();
-            var functionUnderTest = new RepoEventsFunction(mockLoggerFunction.Object, mockService.Object, mockFactory.Object, mockCosmosDbService.Object);                
+            var functionUnderTest = new RepoUpdateFunction(mockLoggerFunction.Object, mockService.Object, mockFactory.Object, mockCosmosDbService.Object);
+            
+            TimerSchedule schedule = new DailySchedule("2:00:00");
+            TimerInfo timerInfo = new TimerInfo(schedule, It.IsAny<ScheduleStatus>(), false);
 
-            var result = functionUnderTest.Run(mockRequest.Object).GetAwaiter().GetResult();            
-
-            Assert.IsTrue(result is OkResult);            
+            functionUnderTest.Run(timerInfo).GetAwaiter().GetResult();                                  
         }
 
     }
