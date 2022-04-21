@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "subscriptionId": {
-      "value": "d43f9b10-9c66-43f8-a701-afc0ad123cfd"
+      "value": ""
     },
     "name": {
       "value": "repoevents"
