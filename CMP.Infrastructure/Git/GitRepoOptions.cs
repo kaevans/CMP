@@ -13,8 +13,7 @@ namespace CMP.Infrastructure.Git
         public string PersonalAccessToken { get; set; }
         public string CollectionUri { get; set; }
         public string Organization { get; set; }
-        public string Project { get; set; }
-        public string Repository { get; set; }
+        public string Project { get; set; }        
         public string MetadataFile { get; set; }
 
         public string GetOrganizationUri()

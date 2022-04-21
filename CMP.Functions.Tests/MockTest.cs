@@ -10,7 +10,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Diagnostics;
 using System.Dynamic;
-using CMPGitRepository = CMP.Core.Models.GitRepository;
 
 namespace CMP.Functions.Tests
 {
@@ -40,9 +39,9 @@ namespace CMP.Functions.Tests
         }
 
         [TestMethod]
-        public void TestFunctionReturnsValidRepo()
+        public void TestFunctionReturnsOkResult()
         {
-            var mockService = new Mock<IGitRepoRepository<DeploymentTemplate>>();
+            var mockService = new Mock<IGitRepoRepository>();
 
             dynamic requestBody = new ExpandoObject();
             dynamic resource = new ExpandoObject();
@@ -55,17 +54,12 @@ namespace CMP.Functions.Tests
             requestBody.resource.repository = repository;
 
             var mockCosmosDbService = new Mock<ICosmosDbRepository<DeploymentTemplate>>();
-            
-            var expected = new CMPGitRepository { Id = requestBody.resource.repository.Id, Name = requestBody.resource.repository.Name };
-            
-                 
+                                                     
             var mockRequest = TestingHelper.CreateMockRequest(requestBody);
             var mockLoggerFunction = TestingHelper.GetLogger<RepoEventsFunction>();
 
-            mockService.Setup(x => x.GetRepositoryAsync()).ReturnsAsync(expected);
-            
-
-            var functionUnderTest = new RepoEventsFunction(mockLoggerFunction.Object, OptionsConfig, mockService.Object, mockCosmosDbService.Object);
+            var mockFactory = new Mock<IGitRepoItemRepositoryFactory<DeploymentTemplate>>();
+            var functionUnderTest = new RepoEventsFunction(mockLoggerFunction.Object, mockService.Object, mockFactory.Object, mockCosmosDbService.Object);                
 
             var result = functionUnderTest.Run(mockRequest.Object).GetAwaiter().GetResult();            
 

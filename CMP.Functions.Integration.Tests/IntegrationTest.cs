@@ -1,6 +1,5 @@
 
 using CMP.Core.Models;
-
 using CMP.Functions.Tests.Core;
 using CMP.Infrastructure.Data;
 using CMP.Infrastructure.Git;
@@ -8,8 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using CMPGitRepository = CMP.Core.Models.GitRepository;
+
 
 namespace CMP.Infrastructure.Tests.Integration
 {
@@ -44,38 +44,39 @@ namespace CMP.Infrastructure.Tests.Integration
         }
 
         [TestMethod]
-        public void TestServiceReturnsValidRepo()
+        public void TestServiceReturnsListOfRepos()
         {
-            var logger = TestingHelper.GetLogger<AzureDevOpsGitRepoRepository>();
-            var service = new AzureDevOpsGitRepoRepository(GitRepoOptions, logger.Object);
+            var logger = TestingHelper.GetLogger<ADORepoRepository>();
+            var service = new ADORepoRepository(GitRepoOptions, logger.Object);
 
-            var expected = new CMPGitRepository
-            {
-                Id = "0",
-                Name = GitRepoOptions.Value.Repository
-            };
-
-            var result = service.GetRepositoryAsync().GetAwaiter().GetResult();
+            var result = service.GetItemsAsync().GetAwaiter().GetResult();
 
 
-            Assert.IsTrue(result is CMPGitRepository);
             Assert.IsNotNull(result);
-
-
-            Assert.AreEqual(result.Name, expected.Name);
+            Assert.IsTrue(result.Count() > 0);            
 
         }
 
         [TestMethod]
         public void TestDevOpsReturnsReadMeItems()
         {
-            var logger = TestingHelper.GetLogger<AzureDevOpsGitRepoRepository>();
-            var service = new AzureDevOpsGitRepoRepository(GitRepoOptions, logger.Object);
+            var deploymentTemplates = new List<DeploymentTemplate>();
+
+            var logger = TestingHelper.GetLogger<ADORepoRepository>();
+            var service = new ADORepoRepository(GitRepoOptions, logger.Object);
+
+            var factoryLogger = TestingHelper.GetLogger<ADODeploymentTemplateRepositoryFactory>();
+            var factory = new ADODeploymentTemplateRepositoryFactory(factoryLogger.Object, GitRepoOptions);
 
             var items = service.GetItemsAsync().GetAwaiter().GetResult();
-
-            Assert.IsNotNull(items);            
-            Assert.IsTrue(items.Count() > 0);
+            foreach(var item in items)
+            {
+                var itemRepository = factory.GetRepoItemRepository(item, factoryLogger.Object);
+                var repoItems = itemRepository.GetItemsAsync().GetAwaiter().GetResult();
+                deploymentTemplates.AddRange(repoItems);
+            }
+                     
+            Assert.IsTrue(deploymentTemplates.Count() > 0);            
         }
 
         [TestMethod]

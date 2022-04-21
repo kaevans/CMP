@@ -55,11 +55,14 @@ namespace CMP.Functions.Test.Integration
             var mockCosmosLogger = TestingHelper.GetLogger<DeploymentTemplateRepository>();
             var cosmosService = new DeploymentTemplateRepository(CosmosOptions, mockCosmosLogger.Object);
 
-            var mockGitLogger = TestingHelper.GetLogger<AzureDevOpsGitRepoRepository>();
-            var gitService = new AzureDevOpsGitRepoRepository(GitRepoOptions, mockGitLogger.Object);
-            
+            var mockGitLogger = TestingHelper.GetLogger<ADORepoRepository>();
+            var gitService = new ADORepoRepository(GitRepoOptions, mockGitLogger.Object);
+
+            var mockFactoryLogger = TestingHelper.GetLogger<ADODeploymentTemplateRepositoryFactory>();
+
+            var gitItemFactory = new ADODeploymentTemplateRepositoryFactory(mockFactoryLogger.Object, GitRepoOptions);
             var mockFunctionLogger = TestingHelper.GetLogger<RepoEventsFunction>();
-            var functionUnderTest = new RepoEventsFunction(mockFunctionLogger.Object, GitRepoOptions, gitService, cosmosService);
+            var functionUnderTest = new RepoEventsFunction(mockFunctionLogger.Object, gitService,gitItemFactory, cosmosService);
 
             var mockRequest = TestingHelper.CreateMockRequest(requestBody);
             var ret = functionUnderTest.Run(mockRequest.Object).GetAwaiter().GetResult();
