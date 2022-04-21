@@ -3,8 +3,7 @@ using CMP.Core.Models;
 
 namespace CMP.Infrastructure.Git
 {
-    public interface IGitRepoRepository : IRepository<GitRepo>
+    public interface IGitRepoItemRepository<T> : IRepository<T> where T : GitRepoItem
     {
-        
     }
 }

@@ -12,7 +12,7 @@ builder.Services.AddOptions<GitRepoOptions>().Configure<IConfiguration>((setting
 {
     configuration.GetSection(GitRepoOptions.SectionName).Bind(settings);
 });
-builder.Services.AddSingleton<IGitRepoRepository<DeploymentTemplate>, AzureDevOpsGitRepoRepository>();
+builder.Services.AddSingleton<IGitRepoRepository, ADORepoRepository>();
 
 builder.Services.AddOptions<CosmosDbOptions>().Configure<IConfiguration>((settings, configuration) =>
 {

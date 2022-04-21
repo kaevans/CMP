@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CMP.Core.Models
 {
 
-    public class GitRepository : Entity
+    public class GitRepo : Entity
     {
         public string Name { get; set; }
         

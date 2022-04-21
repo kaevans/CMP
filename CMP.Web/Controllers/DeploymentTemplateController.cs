@@ -10,12 +10,12 @@ namespace CMP.Web.Controllers
     {
         private readonly ILogger<DeploymentTemplateController> _logger;
         private readonly GitRepoOptions _options;
-        private readonly IGitRepoRepository<DeploymentTemplate> _gitRepositoryService;
+        private readonly IGitRepoRepository _gitRepositoryService;
         private readonly ICosmosDbRepository<DeploymentTemplate> _cosmosDbRepositoryService;
 
         public DeploymentTemplateController(ILogger<DeploymentTemplateController> logger,
             IOptions<GitRepoOptions> options,
-            IGitRepoRepository<DeploymentTemplate> gitRepositoryService,
+            IGitRepoRepository gitRepositoryService,
             ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService
             )
         {
@@ -32,7 +32,7 @@ namespace CMP.Web.Controllers
         }
 
         [ActionName("View")]
-        public async Task<IActionResult> View(string id)
+        public async Task<IActionResult> GetById(string id)
         {
             return View(await _cosmosDbRepositoryService.GetByIdAsync(id));
         }

@@ -2,7 +2,7 @@
 
 namespace CMP.Core.Models
 {
-    public class DeploymentTemplate : Entity
+    public class DeploymentTemplate : GitRepoItem
     {
         [JsonProperty(PropertyName = "$schema")]
         public string Schema { get; set; }
@@ -31,8 +31,7 @@ namespace CMP.Core.Models
         [JsonProperty(PropertyName = "readmeurl")]
         public string ReadmeUrl { get; set; }        
 
-        [JsonProperty(PropertyName = "path")]
-        public string Path { get; set; }
+
 
     }
 }

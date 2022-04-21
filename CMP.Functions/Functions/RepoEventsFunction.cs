@@ -1,4 +1,3 @@
-using CMP.Core.Interfaces;
 using CMP.Core.Models;
 using CMP.Infrastructure.Data;
 using CMP.Infrastructure.Git;
@@ -8,30 +7,28 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
-using CMPGitRepository = CMP.Core.Models.GitRepository;
 
 namespace CMP.Functions
 {
     public class RepoEventsFunction
     {
-        private readonly ILogger<RepoEventsFunction> _logger;
-        private readonly GitRepoOptions _options;
-        private readonly IGitRepoRepository<DeploymentTemplate> _gitRepositoryService;
+        private readonly ILogger<RepoEventsFunction> _logger;        
+        private readonly IGitRepoRepository _gitRepositoryService;
         private readonly ICosmosDbRepository<DeploymentTemplate> _cosmosDbRepositoryService;
+        private readonly IGitRepoItemRepositoryFactory<DeploymentTemplate> _gitRepoItemRepositoryFactory;
 
         public RepoEventsFunction(ILogger<RepoEventsFunction> logger, 
-            IOptions<GitRepoOptions> options,
-            IGitRepoRepository<DeploymentTemplate> gitRepositoryService,
+            IGitRepoRepository gitRepositoryService,
+            IGitRepoItemRepositoryFactory<DeploymentTemplate> gitRepoItemRepositoryFactory,
             ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService
             )
         {
             _logger = logger;
-            _options = options.Value;
             _gitRepositoryService = gitRepositoryService;
-            _cosmosDbRepositoryService = cosmosDbRepositoryService; 
+            _cosmosDbRepositoryService = cosmosDbRepositoryService;
+            _gitRepoItemRepositoryFactory = gitRepoItemRepositoryFactory;
         }
 
 
@@ -48,12 +45,17 @@ namespace CMP.Functions
 
                 _logger.LogInformation("Data Received: " + data);
 
-                // Get all items from repository                
-                var items = await _gitRepositoryService.GetItemsAsync();
+                // Get all repositories from project                
+                var repoList = await _gitRepositoryService.GetItemsAsync();
 
-                foreach (var item in items)
+                foreach (var repo in repoList)
                 {
-                    await _cosmosDbRepositoryService.UpdateAsync(item);
+                    var repoItemRepository = _gitRepoItemRepositoryFactory.GetRepoItemRepository(repo, _logger);
+                    var items = await repoItemRepository.GetItemsAsync();
+                    foreach (var item in items)
+                    {
+                        await _cosmosDbRepositoryService.UpdateAsync(item);
+                    }                    
                 }
                 
                 return new OkResult();
