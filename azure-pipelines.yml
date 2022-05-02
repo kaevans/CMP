@@ -8,7 +8,7 @@ trigger:
 
 variables:
   # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: '1e6ba995-3260-44e0-93b2-85e962bec10f'
+  azureSubscription: 'CMP Deployment'
 
   # Function app name
   functionAppName: 'repoevents'
