@@ -10,7 +10,13 @@ namespace CMP.Core.Models
     public class GitRepoItem : Entity
     {
         [JsonProperty(PropertyName = "$schema")]
+        public string Schema { get; set; }
+
+        [JsonProperty(PropertyName = "commitId")]
         public string CommitId { get; set; }
+
+        [JsonProperty(PropertyName = "originalObjectId")]
+        public string OriginalObjectId { get; set; }
 
         [JsonProperty(PropertyName = "gitUsername")]
         public string GitUserName { get; set; }

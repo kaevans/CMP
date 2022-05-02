@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CMP.Core.Models.DeploymentTemplate>
+@model IEnumerable<CMP.Core.Models.DeploymentTemplate>;
 
 @{
     ViewData["Title"] = "Index";
@@ -6,49 +6,65 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 
 <main role="main">
 
     <section class="jumbotron text-center">
         <div class="container">
-            <h1 class="jumbotron-heading">Album example</h1>
-            <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don't simply skip over it entirely.</p>
-            <p>
-                <a href="#" class="btn btn-primary my-2">Main call to action</a>
-                <a href="#" class="btn btn-secondary my-2">Secondary action</a>
-            </p>
+            <h1 class="jumbotron-heading">Featured Patterns</h1>
+            <p class="lead text-muted">This page contains featured patterns recommended for use for typical workloads.</p>
+            <p class="lead text-muted">Search for approved patterns:</p>
+            
+            @using (Html.BeginForm("Search", "DeploymentTemplate", FormMethod.Post))
+            {
+                // Display the search text box, with the search icon to the right of it.
+                <div >
+                    <input type="text" class="searchBox" id="searchText" name="searchText">
+                    <button  type="submit" value="">
+                        <span class="glyphicon glyphicon-search"></span> Search 
+                    </button>
+                </div>                
+            }
+
+            <!--
+            <a href="#" class="btn btn-primary my-2">Main call to action</a>
+            <a href="#" class="btn btn-secondary my-2">Secondary action</a>
+            -->
+            
         </div>
     </section>
 
     <div class="album py-5 bg-light">
         <div class="container">
-
-            <div class="row">
-                @using (Html.BeginForm("View", "DeploymentTemplate", FormMethod.Get))
-                {                                    
-                    @foreach (var item in Model)
-                    {
-                        <div class="col-md-4">
-                            <div class="card mb-4 box-shadow">
+            
+            @using (Html.BeginForm("View", "DeploymentTemplate", FormMethod.Get))
+            {                          
+                <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-4">
+                        <div class="card mb-4 box-shadow">
                                 
-                                <img class="card-img-top" src="~/images/thumbnail.png" alt="Card image cap">
-                                <div class="card-body">
-                                    <p class="card-text">@Html.DisplayFor(modelItem => item.Name)</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="btn-group">
-                                            @Html.ActionLink("View", "View", new { id=item.Id }, new {@class="btn btn-sm btn-outline-secondary"})                                                                                    
-                                        </div>
-                                        <small class="text-muted">9 mins</small>
-                                    </div>
-                                </div>
+                            <img class="card-img-top" src="https://mdbcdn.b-cdn.net/img/new/standard/city/044.webp" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">@item.Name</h5>
+                                <p class="card-text">@item.Description</p>
+                                @Html.ActionLink("View Details", "View", new { id=item.Id }, new {@class="btn btn-sm btn-outline-primary"}) 
+                                <a href="@item.ReadmeUrl" class="btn btn-sm btn-outline-secondary">View on Azure DevOps</a>                      
+                      
+                                <p class="card-text">
+                                    <small class="text-muted">Last updated @item.DateUpdated</small>
+                                </p>
                             </div>
-                        </div>                    
-                    }
+
+                        </div>
+                    </div>                    
                 }
-            </div>
+                </div>
+            }            
         </div>
     </div>
 </main>
+
+<div>API result</div>
+<div>@ViewData["ApiResult"]</div>

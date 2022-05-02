@@ -1,34 +1,57 @@
-﻿using CMP.Core.Models;
+﻿using Azure;
+using Azure.Search.Documents;
+using Azure.Search.Documents.Indexes;
+using CMP.Core.Models;
 using CMP.Infrastructure.Data;
 using CMP.Infrastructure.Git;
+using CMP.Infrastructure.Search;
+using CMP.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace CMP.Web.Controllers
 {
+    [Authorize]
     public class DeploymentTemplateController : Controller
     {
         private readonly ILogger<DeploymentTemplateController> _logger;
         private readonly GitRepoOptions _options;
         private readonly IGitRepoRepository _gitRepositoryService;
         private readonly ICosmosDbRepository<DeploymentTemplate> _cosmosDbRepositoryService;
+        private readonly ISearchService<DeploymentTemplateSearchResult> _searchService;
+        
 
-        public DeploymentTemplateController(ILogger<DeploymentTemplateController> logger,
+        public DeploymentTemplateController(
+            ILogger<DeploymentTemplateController> logger,
             IOptions<GitRepoOptions> options,
             IGitRepoRepository gitRepositoryService,
-            ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService
-            )
+            ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService,
+            ISearchService<DeploymentTemplateSearchResult> searchService)            
         {
             _logger = logger;
             _options = options.Value;
             _gitRepositoryService = gitRepositoryService;
             _cosmosDbRepositoryService = cosmosDbRepositoryService;
+            _searchService = searchService;
         }
+
 
         [ActionName("Index")]
         public async Task<IActionResult> Index()
         {
-            return View(await _cosmosDbRepositoryService.GetItemsAsync());
+            var featuredItems = await _cosmosDbRepositoryService.GetItemsAsync();
+
+            return View(featuredItems);
+        }
+
+        [HttpPost]
+        [ActionName("Search")]
+        public async Task<IActionResult> Search(SearchData model)
+        {
+            var results = await _searchService.SearchAsync(model);                                    
+            
+            return View(results);
         }
 
         [ActionName("View")]

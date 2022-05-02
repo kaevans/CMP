@@ -65,7 +65,7 @@
             @Html.DisplayNameFor(model => model.ReadmeUrl)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ReadmeUrl)
+            <a href="@Model.ReadmeUrl">View readme.md in Azure DevOps</a>            
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Id)
@@ -76,8 +76,5 @@
     </dl>
 </div>
 <div>
-    <button type="button" onclick="window.location.href='https://portal.azure.com/#create/Microsoft.Template/uri/@azureDeploy'" class="btn btn-sm btn-outline-secondary">
-        <img src="https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true" />
-    </button>
      <a asp-action="Index">Back to List</a>
 </div>

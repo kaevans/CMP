@@ -1,0 +1,26 @@
+﻿ @model CMP.Web.Models.SubscriptionModel
+
+ <script src="~/lib/jquery/dist/jquery.min.js"></script>
+ <script src="~/js/subscription.js" asp-append-version="true"></script>
+ <div id="dropDownListdiv">
+     @using (Html.BeginForm("Index", "PipelineDeployment", FormMethod.Post))
+     {
+         <dl class="row">
+             <dt class="col-sm-2">
+                 @Html.DisplayNameFor(m => m.Subscriptions)
+             </dt>
+             <dd class="col-sm-10">
+                 @Html.DropDownListFor(m => m.SubscriptionId, Model.Subscriptions, "Please select", new { @class = "form-control" })
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(m => m.ResourceGroups)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DropDownListFor(m => m.ResourceGroupId, Model.ResourceGroups, "Please select", new { @class = "form-control" })
+             </dd>
+         </dl>
+        <div class="col-md-4">
+            <input type="submit" value="Submit" />
+        </div>
+     }
+ </div>

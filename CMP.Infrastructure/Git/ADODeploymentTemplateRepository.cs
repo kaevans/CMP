@@ -75,7 +75,7 @@ namespace CMP.Infrastructure.Git
                     metadataFile.Path,
                     includeContent: true,
                     includeContentMetadata: true);
-
+                
                 _logger.LogInformation("Deserializing:{0}", item.Content);
 
                 var deploymentTemplate = JsonConvert.DeserializeObject<DeploymentTemplate>(item.Content);
@@ -83,7 +83,9 @@ namespace CMP.Infrastructure.Git
                 var readmePath = item.Path.Replace(_options.MetadataFile, "readme.md", StringComparison.OrdinalIgnoreCase);
                 if (null != deploymentTemplate)
                 {
-                    deploymentTemplate.Id = item.ObjectId;
+                    deploymentTemplate.Id = _repo.Id + item.ObjectId;
+                    deploymentTemplate.OriginalObjectId = item.OriginalObjectId;
+                    deploymentTemplate.CommitId = item.CommitId;
                     deploymentTemplate.Url = item.Url;
                     deploymentTemplate.Path = item.Path;
                     deploymentTemplate.ReadmeUrl = String.Format("{0}/{1}/_git/{2}?path={3}", _options.GetOrganizationUri(), _options.Project, _repo.Name, readmePath);

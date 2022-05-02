@@ -33,7 +33,7 @@ namespace CMP.Functions
         
         [FunctionName("RepoUpdate")]
         public async Task Run(
-            [TimerTrigger("0 0 */5 * * *")] TimerInfo myTimer)
+            [TimerTrigger("%Schedule%")] TimerInfo myTimer)
         {
             try
             {                
