@@ -1,0 +1,61 @@
+﻿@model CMP.Web.Models.SearchData;
+
+@{
+    ViewData["Title"] = "Search Page";
+}
+
+
+<h1 class="sampleTitle">
+    <img src="~/images/azure-logo.png" width="80" />
+    Approved Patterns Search
+</h1>
+<div>
+     <a asp-action="Index">Back to List</a>
+</div>
+@using (Html.BeginForm("Search", "DeploymentTemplate", FormMethod.Post))
+{
+    // Display the search text box, with the search icon to the right of it.
+    <div class="searchBoxForm">
+        @Html.TextBoxFor(m => m.SearchText, new { @class = "searchBox" }) 
+        
+        
+        <button class="searchBoxSubmit" type="submit" value="">
+            <span class="glyphicon glyphicon-search"></span> Search 
+        </button>
+    </div>
+}
+ 
+@using (Html.BeginForm("View", "DeploymentTemplate", FormMethod.Get))
+{   
+    var results = Model.ResultList.GetResults().ToList();
+
+    // Show the result count.
+    <p class="sampleText">
+        @Model.ResultList.TotalCount Results
+    </p>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+  
+        @for (var i = 0; i < results.Count; i++)
+        {            
+            <div class="col">
+                <div class="card">                
+                  <img class="card-img-top" src="https://mdbcdn.b-cdn.net/img/new/standard/city/041.webp" alt="Card image cap">
+                  <div class="card-body">
+                      <h5 class="card-title">@results[i].Document.itemDisplayName</h5>
+                      <p class="card-text">@results[i].Document.description</p>
+                      @Html.ActionLink("View Details", "View", new { id=results[i].Document.id }, new {@class="btn btn-sm btn-outline-primary"}) 
+                      <a href="@results[i].Document.readmeurl" class="btn btn-sm btn-outline-secondary">View on Azure DevOps</a>                      
+                      
+                      <p class="card-text">
+                        <small class="text-muted">Last updated @results[i].Document.dateUpdated</small>
+                      </p>
+                    </div>
+                </div>   
+            </div>
+        }
+    </div>          
+}
+<div>
+     <a asp-action="Index">Back to List</a>
+</div>
