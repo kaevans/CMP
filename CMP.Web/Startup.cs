@@ -64,22 +64,14 @@ namespace CMP.Web
             services.AddOptions<ResourceManagementOptions>().Configure<IConfiguration>((settings, configuration) =>
             {
                 configuration.GetSection(ResourceManagementOptions.SectionName).Bind(settings);
-            });
+            });                  
+            services.AddHttpClient<IResourceManagementService, ResourceManagementService>();
 
             services.AddOptions<AzureSearchOptions>().Configure<IConfiguration>((settings, configuration) =>
             {
                 configuration.GetSection(AzureSearchOptions.SectionName).Bind(settings);
             });
             services.AddSingleton<ISearchService<DeploymentTemplateSearchResult>, DeploymentTemplateSearchService>();
-
-
-            // Add APIs
-            //services.AddGraphService(Configuration);
-            services.AddHttpClient<IResourceManagementService, ResourceManagementService>();
-            //services.AddHttpClient<IArmOperationsWithImplicitAuth, ArmApiOperationServiceWithImplicitAuth>()
-            //    .AddMicrosoftIdentityUserAuthenticationHandler(
-            //        "arm",
-            //        options => options.Scopes = $"{ArmApiOperationService.ArmResource}user_impersonation");
 
             services.AddControllersWithViews(options =>
             {
