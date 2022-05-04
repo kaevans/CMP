@@ -33,19 +33,14 @@ namespace CMP.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-                // Handling SameSite cookie according to https://docs.microsoft.com/en-us/aspnet/core/security/samesite?view=aspnetcore-3.1
-                options.HandleSameSiteCookieCompatibility();
-            });
-
             services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-               .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"))
-               .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddInMemoryTokenCaches();
+                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"));
+
+            services.AddAuthorization(options =>
+            {
+                // By default, all incoming requests will be authorized according to the default policy.
+                options.FallbackPolicy = options.DefaultPolicy;
+            });
 
             services.AddApplicationInsightsTelemetry(Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
 
@@ -61,11 +56,13 @@ namespace CMP.Web
             });
             services.AddSingleton<ICosmosDbRepository<DeploymentTemplate>, DeploymentTemplateRepository>();
 
+            /*
             services.AddOptions<ResourceManagementOptions>().Configure<IConfiguration>((settings, configuration) =>
             {
                 configuration.GetSection(ResourceManagementOptions.SectionName).Bind(settings);
             });                  
             services.AddHttpClient<IResourceManagementService, ResourceManagementService>();
+            */
 
             services.AddOptions<AzureSearchOptions>().Configure<IConfiguration>((settings, configuration) =>
             {
