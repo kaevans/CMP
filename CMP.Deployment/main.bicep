@@ -15,6 +15,10 @@ param location string = resourceGroup().location
 @description('Azure AD client ID for an app registration')
 param clientId string = '4147e318-8985-454b-a94c-134d9b780ae5'
 
+@description('Azure AD client secret for an app registration')
+@secure()
+param clientSecret string
+
 @description('Azure AD domain used for authentication')
 param domain string = 'cmpgitops.onmicrosoft.com'
 
@@ -365,6 +369,10 @@ resource web 'Microsoft.Web/sites@2018-11-01' = {
         {
           name:'AzureAd:ClientId'
           value:clientId
+        }
+        {
+          name:'AzureAd:ClientSecret'
+          value:clientSecret
         }
         {
           name:'AzureAd:Scopes'

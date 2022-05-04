@@ -14,6 +14,14 @@
     "clientId": {
         "value": "4147e318-8985-454b-a94c-134d9b780ae5"
     },
+    "clientSecret": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d43f9b10-9c66-43f8-a701-afc0ad123cfd/resourceGroups/rg-cmp/providers/Microsoft.KeyVault/vaults/kv-cmp"
+        },
+        "secretName": "azureADClientSecret"
+      }
+    },    
     "domain": {
         "value": "cmpgitops.onmicrosoft.com"
     },
