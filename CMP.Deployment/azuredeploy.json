@@ -418,7 +418,7 @@
             },
             {
               "name": "AzureAd:TenantId",
-              "value": "[tenant().tenantId]"
+              "value": "[environment().authentication.tenant]"
             },
             {
               "name": "AzureAd:ClientId",
