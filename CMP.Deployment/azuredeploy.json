@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.5.6.12127",
-      "templateHash": "2861453334486859807"
+      "templateHash": "7316142329921642867"
     }
   },
   "parameters": {
@@ -40,6 +40,12 @@
       "defaultValue": "4147e318-8985-454b-a94c-134d9b780ae5",
       "metadata": {
         "description": "Azure AD client ID for an app registration"
+      }
+    },
+    "clientSecret": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Azure AD client secret for an app registration"
       }
     },
     "domain": {
@@ -417,6 +423,10 @@
             {
               "name": "AzureAd:ClientId",
               "value": "[parameters('clientId')]"
+            },
+            {
+              "name": "AzureAd:ClientSecret",
+              "value": "[parameters('clientSecret')]"
             },
             {
               "name": "AzureAd:Scopes",
