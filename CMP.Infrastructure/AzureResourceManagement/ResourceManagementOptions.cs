@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CMP.Infrastructure.Cloud.Azure.ResourceManagement
+namespace CMP.Infrastructure.AzureResourceManagement
 {
     public class ResourceManagementOptions
     {

@@ -37,5 +37,9 @@ namespace CMP.Web.Models
 
         [SimpleField]
         public string readmeurl { get; set; }
+
+        [SimpleField]
+        public string architecturediagramuri { get; set; }
+        
     }
 }

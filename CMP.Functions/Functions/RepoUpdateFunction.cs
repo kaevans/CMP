@@ -1,12 +1,9 @@
 using CMP.Core.Models;
-using CMP.Infrastructure.Data;
+using CMP.Infrastructure.CosmosDb;
 using CMP.Infrastructure.Git;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using CMP.Infrastructure.Storage;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 
@@ -18,17 +15,20 @@ namespace CMP.Functions
         private readonly IGitRepoRepository _gitRepositoryService;
         private readonly ICosmosDbRepository<DeploymentTemplate> _cosmosDbRepositoryService;
         private readonly IGitRepoItemRepositoryFactory<DeploymentTemplate> _gitRepoItemRepositoryFactory;
+        private readonly IAzureBlobStorageRepository _blobStorageRepository;
 
         public RepoUpdateFunction(ILogger<RepoUpdateFunction> logger, 
             IGitRepoRepository gitRepositoryService,
             IGitRepoItemRepositoryFactory<DeploymentTemplate> gitRepoItemRepositoryFactory,
-            ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService
+            ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService,
+            IAzureBlobStorageRepository blobStorageRepository
             )
         {
             _logger = logger;
             _gitRepositoryService = gitRepositoryService;
             _cosmosDbRepositoryService = cosmosDbRepositoryService;
             _gitRepoItemRepositoryFactory = gitRepoItemRepositoryFactory;
+            _blobStorageRepository = blobStorageRepository;
         }
         
         [FunctionName("RepoUpdate")]
@@ -48,11 +48,19 @@ namespace CMP.Functions
                     var items = await repoItemRepository.GetItemsAsync();
                     foreach (var item in items)
                     {
+                        if(null != item.ArchitectureDiagramContents)
+                        {
+                            using(item.ArchitectureDiagramContents)
+                            {
+                                await _blobStorageRepository.AddAsync(item.Id, item.ArchitectureDiagramContents);
+                                //Write the new blob URL to the item
+                                item.ArchitectureDiagramUri = await _blobStorageRepository.GetSasUri(item.Id);
+                            }                            
+                        }
+                        
                         await _cosmosDbRepositoryService.UpdateAsync(item);
                     }                    
                 }
-                
-                
             }
             catch (Exception ex)
             {

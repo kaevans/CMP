@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CMP.Core\CMP.Core.csproj" />
-    <ProjectReference Include="..\CMP.Functions.Tests.Core\CMP.Functions.Tests.Core.csproj" />
+    <ProjectReference Include="..\CMP.Functions.Tests.Core\CMP.Tests.Core.csproj" />
     <ProjectReference Include="..\CMP.Functions\CMP.Functions.csproj" />
   </ItemGroup>
 

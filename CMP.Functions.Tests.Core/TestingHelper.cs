@@ -1,4 +1,4 @@
-﻿using CMP.Infrastructure.Data;
+﻿using CMP.Infrastructure.CosmosDb;
 using CMP.Infrastructure.Git;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +7,7 @@ using Moq;
 using Newtonsoft.Json;
 using System.Diagnostics;
 
-namespace CMP.Functions.Tests.Core
+namespace CMP.Tests.Core
 {
     public static class TestingHelper
     {
@@ -63,35 +63,20 @@ namespace CMP.Functions.Tests.Core
 
         public static IConfigurationRoot GetIConfigurationRoot(string outputPath)
         {
-            //TODO: Validte if the usersecrets.json GUID changes
+            /*Load the local user secrets for:
+             * CMP.Functions.Tests.Integration
+             * CMP.Infrastructure.Tests.Integration
+             * CMP.Web.Tests.Integration
+            */
             return new ConfigurationBuilder()
                 .SetBasePath(outputPath)
                 .AddJsonFile("appsettings.json", optional: true)
+                .AddUserSecrets("1fa5401d-f71e-47f4-87c7-f19beec008bc")
                 .AddUserSecrets("426bd3ab-8222-415e-977d-6529dafc9f78")
+                .AddUserSecrets("00b47812-f6e7-4bf0-9b15-947fcb50b285")
                 .AddEnvironmentVariables()
                 .Build();
         }
 
-        public static GitRepoOptions GetApplicationConfiguration(string outputPath)
-        {
-            var configuration = new GitRepoOptions();
-
-            var iConfig = GetIConfigurationRoot(outputPath);
-
-            iConfig.GetSection(GitRepoOptions.SectionName).Bind(configuration);
-
-            return configuration;
-        }
-
-        public static CosmosDbOptions GetCosmosDBConfiguration(string outputPath)
-        {
-            var configuration = new CosmosDbOptions();
-
-            var iConfig = GetIConfigurationRoot(outputPath);
-
-            iConfig.GetSection(CosmosDbOptions.SectionName).Bind(configuration);
-
-            return configuration;
-        }
     }
 }

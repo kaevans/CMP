@@ -1,11 +1,15 @@
-using CMP.Functions.Tests.Core;
-using CMP.Infrastructure.Data;
+using CMP.Tests.Core;
+using CMP.Infrastructure.CosmosDb;
 using CMP.Infrastructure.Git;
+using CMP.Infrastructure.Storage;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Dynamic;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Timers;
+using Moq;
 
 namespace CMP.Functions.Test.Integration
 {
@@ -14,6 +18,7 @@ namespace CMP.Functions.Test.Integration
     {
         private static IOptions<GitRepoOptions> GitRepoOptions { get; set; }
         private static IOptions<CosmosDbOptions> CosmosOptions { get; set; }
+        private static IOptions<AzureBlobStorageOptions> BlobStorageOptions { get; set; }
 
         [ClassInitialize]
         public static void Init(TestContext testContext)
@@ -26,12 +31,14 @@ namespace CMP.Functions.Test.Integration
             var configurationRoot = TestingHelper.GetIConfigurationRoot(testContext.DeploymentDirectory);
             services.Configure<GitRepoOptions>(configurationRoot.GetSection(Infrastructure.Git.GitRepoOptions.SectionName));
             services.Configure<CosmosDbOptions>(configurationRoot.GetSection(CosmosDbOptions.SectionName));
+            services.Configure<AzureBlobStorageOptions>(configurationRoot.GetSection(AzureBlobStorageOptions.SectionName));
 
             var serviceProvider = services.BuildServiceProvider();
 
             // to use (or store in )
             GitRepoOptions = serviceProvider.GetRequiredService<IOptions<GitRepoOptions>>();
             CosmosOptions = serviceProvider.GetRequiredService<IOptions<CosmosDbOptions>>();
+            BlobStorageOptions = serviceProvider.GetRequiredService<IOptions<AzureBlobStorageOptions>>();
 
 
             var client = new Microsoft.Azure.Cosmos.CosmosClient(CosmosOptions.Value.Account, CosmosOptions.Value.Key);
@@ -40,17 +47,8 @@ namespace CMP.Functions.Test.Integration
         }
 
         [TestMethod]
-        public void TestFunctionReadsRepositoryAndUpdatesDatabase()
+        public void TestFunctionExecutesWithoutExceptions()
         {
-            dynamic requestBody = new ExpandoObject();
-            dynamic resource = new ExpandoObject();
-            resource.pullRequestId = "1";
-            resource.pullRequestTitle = "demo title";
-            dynamic repository = new ExpandoObject();
-            repository.Id = "1";
-            repository.Name = "demo repo";
-            requestBody.resource = resource;
-            requestBody.resource.repository = repository;
                        
             var mockCosmosLogger = TestingHelper.GetLogger<DeploymentTemplateRepository>();
             var cosmosService = new DeploymentTemplateRepository(CosmosOptions, mockCosmosLogger.Object);
@@ -61,15 +59,18 @@ namespace CMP.Functions.Test.Integration
             var mockFactoryLogger = TestingHelper.GetLogger<ADODeploymentTemplateRepositoryFactory>();
 
             var gitItemFactory = new ADODeploymentTemplateRepositoryFactory(mockFactoryLogger.Object, GitRepoOptions);
+
+            var mockStorageLogger = TestingHelper.GetLogger<AzureBlobStorageRepository>();
+            var storageService = new AzureBlobStorageRepository(BlobStorageOptions, mockStorageLogger.Object);
+
             var mockFunctionLogger = TestingHelper.GetLogger<RepoUpdateFunction>();
-            var functionUnderTest = new RepoUpdateFunction(mockFunctionLogger.Object, gitService,gitItemFactory, cosmosService);
 
-            var mockRequest = TestingHelper.CreateMockRequest(requestBody);
-            var ret = functionUnderTest.Run(mockRequest.Object).GetAwaiter().GetResult();
+            var functionUnderTest = new RepoUpdateFunction(mockFunctionLogger.Object, gitService, gitItemFactory, cosmosService, storageService);
 
-            Assert.IsTrue(ret is OkResult);
+            TimerSchedule schedule = new DailySchedule("2:00:00");
+            TimerInfo timerInfo = new TimerInfo(schedule, It.IsAny<ScheduleStatus>(), false);
 
-
+            functionUnderTest.Run(timerInfo).GetAwaiter().GetResult();            
         }
     }
 }

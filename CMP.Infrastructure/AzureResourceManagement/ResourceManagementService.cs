@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace CMP.Infrastructure.Cloud.Azure.ResourceManagement
+namespace CMP.Infrastructure.AzureResourceManagement
 {
 
     public static class AzureServiceServiceExtensions
@@ -16,7 +16,7 @@ namespace CMP.Infrastructure.Cloud.Azure.ResourceManagement
         public static void AddAzureService(this IServiceCollection services, IConfiguration configuration)
         {
             // https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
-            services.AddHttpClient<ICloudService, ResourceManagementService>();
+            services.AddHttpClient<IResourceManagementService, ResourceManagementService>();
         }
     }
 

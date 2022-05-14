@@ -1,23 +1,14 @@
 ﻿using CMP.Core.Models;
-using CMP.Infrastructure.Cloud.Azure.ResourceManagement;
-using CMP.Infrastructure.Data;
+using CMP.Infrastructure.CosmosDb;
 using CMP.Infrastructure.Git;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Identity.Web;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Identity.Web.UI;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using NuGet.Configuration;
 using CMP.Infrastructure.Search;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using CMP.Web.Models;
 using CMP.Web.Services;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 
 namespace CMP.Web
 {
@@ -33,8 +24,12 @@ namespace CMP.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string[] initialScopes = Configuration.GetValue<string>("DownstreamApi:Scopes")?.Split(' ');
+
             services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"));
+                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"))
+                .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)                
+                .AddInMemoryTokenCaches();
 
             services.AddAuthorization(options =>
             {
