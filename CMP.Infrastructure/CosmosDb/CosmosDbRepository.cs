@@ -7,7 +7,7 @@ using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CMP.Infrastructure.Data
+namespace CMP.Infrastructure.CosmosDb
 {
 
     public abstract class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : Entity

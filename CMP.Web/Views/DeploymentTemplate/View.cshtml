@@ -12,13 +12,8 @@
 <div>
     <h4>DeploymentTemplate</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Schema)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Schema)
-        </dd>
+    <img src="@Model.ArchitectureDiagramUri" />
+    <dl class="row">        
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Type)
         </dt>

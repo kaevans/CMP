@@ -1,9 +1,6 @@
 ﻿using CMP.Core.Models.Azure;
-using CMP.Infrastructure.Cloud;
-using CMP.Infrastructure.Cloud.Azure.ResourceManagement;
+using CMP.Infrastructure.AzureResourceManagement;
 using CMP.Web.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;

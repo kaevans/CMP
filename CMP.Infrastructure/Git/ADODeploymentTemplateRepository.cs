@@ -54,8 +54,9 @@ namespace CMP.Infrastructure.Git
             var items = await gitClient.GetItemsAsync(
                 Guid.Parse(_repo.Id),
                 scopePath: "/",
-                recursionLevel: VersionControlRecursionType.Full,
-                includeContentMetadata: false);
+                recursionLevel: VersionControlRecursionType.OneLevel,
+                includeContentMetadata: false,
+                download:true);
 
             _logger.LogInformation("Returned {0} items from Azure DevOps repo: {1}", items.Count(), _repo.Id);
 
@@ -67,7 +68,7 @@ namespace CMP.Infrastructure.Git
             _logger.LogInformation("Returned {0} files containing path {1} from Azure DevOps repo: {2}", metadataFiles.Count(), _options.MetadataFile, _repo.Id);
 
             foreach (var metadataFile in metadataFiles)
-            {
+            {                
                 _logger.LogInformation("Retrieving:{0}, URL:{1}", metadataFile.Path, metadataFile.Url);
 
                 var item = await gitClient.GetItemAsync(
@@ -81,6 +82,34 @@ namespace CMP.Infrastructure.Git
                 var deploymentTemplate = JsonConvert.DeserializeObject<DeploymentTemplate>(item.Content);
 
                 var readmePath = item.Path.Replace(_options.MetadataFile, "readme.md", StringComparison.OrdinalIgnoreCase);
+                
+                var architectureDiagramPath = item.Path.Replace(_options.MetadataFile, "images/architecture.png", StringComparison.OrdinalIgnoreCase);
+                //Get the architecture diagram file blob. Requires first getting the SHA1 of the 
+                //file, which is the ObjectId of the item, using the GetItem API. Then use the
+                //objectId to get the blob.
+                try
+                {
+                    
+                    var architectureDiagramGitItem = await gitClient.GetItemAsync(
+                        Guid.Parse(_repo.Id),
+                        architectureDiagramPath,
+                        includeContent: false,
+                        includeContentMetadata: true);
+
+                    if (null != architectureDiagramGitItem)
+                    {
+                        //Now download the blob using the ObjectId property
+                        deploymentTemplate.ArchitectureDiagramContents = await gitClient.GetBlobContentAsync(
+                            _repo.Id,
+                            architectureDiagramGitItem.ObjectId);                         
+                    }
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                }
+
+
                 if (null != deploymentTemplate)
                 {
                     deploymentTemplate.Id = _repo.Id + item.ObjectId;
@@ -88,7 +117,7 @@ namespace CMP.Infrastructure.Git
                     deploymentTemplate.CommitId = item.CommitId;
                     deploymentTemplate.Url = item.Url;
                     deploymentTemplate.Path = item.Path;
-                    deploymentTemplate.ReadmeUrl = String.Format("{0}/{1}/_git/{2}?path={3}", _options.GetOrganizationUri(), _options.Project, _repo.Name, readmePath);
+                    deploymentTemplate.ReadmeUrl = String.Format("{0}/{1}/_git/{2}?path={3}", _options.GetOrganizationUri(), _options.Project, _repo.Name, readmePath);                                        
                     ret.Add(deploymentTemplate);
                 }
                 else

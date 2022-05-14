@@ -1,8 +1,5 @@
-﻿using Azure;
-using Azure.Search.Documents;
-using Azure.Search.Documents.Indexes;
-using CMP.Core.Models;
-using CMP.Infrastructure.Data;
+﻿using CMP.Core.Models;
+using CMP.Infrastructure.CosmosDb;
 using CMP.Infrastructure.Git;
 using CMP.Infrastructure.Search;
 using CMP.Web.Models;

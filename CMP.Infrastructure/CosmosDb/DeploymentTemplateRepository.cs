@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CMP.Infrastructure.Data
+namespace CMP.Infrastructure.CosmosDb
 {
     public class DeploymentTemplateRepository : CosmosDbRepository<DeploymentTemplate>
     {

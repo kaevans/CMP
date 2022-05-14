@@ -1,14 +1,12 @@
-﻿using CMP.Core.Interfaces;
-using CMP.Core.Models;
+﻿using CMP.Core.Models;
 
-using CMP.Infrastructure.Data;
+using CMP.Infrastructure.CosmosDb;
 using CMP.Infrastructure.Git;
-using Microsoft.Azure.Cosmos;
+using CMP.Infrastructure.Storage;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
-using System.Threading.Tasks;
 
 [assembly: FunctionsStartup(typeof(CMP.Functions.Startup))]
 
@@ -41,6 +39,13 @@ namespace CMP.Functions
                 configuration.GetSection(CosmosDbOptions.SectionName).Bind(settings);
             });            
             builder.Services.AddSingleton<ICosmosDbRepository<DeploymentTemplate>, DeploymentTemplateRepository>();
+
+            builder.Services.AddOptions<AzureBlobStorageOptions>().Configure<IConfiguration>((settings, configuration) =>
+            {
+                configuration.GetSection(AzureBlobStorageOptions.SectionName).Bind(settings);
+            });
+            builder.Services.AddSingleton<IAzureBlobStorageRepository, AzureBlobStorageRepository>();
+
         }
 
     }

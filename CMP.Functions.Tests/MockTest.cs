@@ -1,9 +1,8 @@
-﻿using CMP.Core.Interfaces;
-using CMP.Core.Models;
-using CMP.Functions.Tests.Core;
-using CMP.Infrastructure.Data;
+﻿using CMP.Core.Models;
+using CMP.Tests.Core;
+using CMP.Infrastructure.CosmosDb;
 using CMP.Infrastructure.Git;
-using Microsoft.AspNetCore.Mvc;
+using CMP.Infrastructure.Storage;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +10,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Diagnostics;
-using System.Dynamic;
 
 namespace CMP.Functions.Tests
 {
@@ -46,11 +44,13 @@ namespace CMP.Functions.Tests
             var mockService = new Mock<IGitRepoRepository>();
 
             var mockCosmosDbService = new Mock<ICosmosDbRepository<DeploymentTemplate>>();
-                                                                 
+
+            var mockStorageService = new Mock<IAzureBlobStorageRepository>();
+
             var mockLoggerFunction = TestingHelper.GetLogger<RepoUpdateFunction>();
 
             var mockFactory = new Mock<IGitRepoItemRepositoryFactory<DeploymentTemplate>>();
-            var functionUnderTest = new RepoUpdateFunction(mockLoggerFunction.Object, mockService.Object, mockFactory.Object, mockCosmosDbService.Object);
+            var functionUnderTest = new RepoUpdateFunction(mockLoggerFunction.Object, mockService.Object, mockFactory.Object, mockCosmosDbService.Object, mockStorageService.Object);
             
             TimerSchedule schedule = new DailySchedule("2:00:00");
             TimerInfo timerInfo = new TimerInfo(schedule, It.IsAny<ScheduleStatus>(), false);

@@ -1,7 +1,7 @@
 
 using CMP.Core.Models;
-using CMP.Functions.Tests.Core;
-using CMP.Infrastructure.Data;
+using CMP.Tests.Core;
+using CMP.Infrastructure.CosmosDb;
 using CMP.Infrastructure.Git;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -57,7 +57,7 @@ namespace CMP.Infrastructure.Tests.Integration
         }
 
         [TestMethod]
-        public void TestDevOpsReturnsReadMeItems()
+        public void TestDevOpsReturnsDeploymentTemplates()
         {
             var deploymentTemplates = new List<DeploymentTemplate>();
 

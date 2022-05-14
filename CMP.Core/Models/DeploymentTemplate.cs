@@ -18,5 +18,11 @@ namespace CMP.Core.Models
 
         [JsonProperty(PropertyName = "readmeurl")]
         public string ReadmeUrl { get; set; }
+
+        [JsonProperty(PropertyName = "architecturediagramuri")]
+        public Uri ArchitectureDiagramUri { get; set; }
+
+        [JsonIgnore]
+        public Stream ArchitectureDiagramContents { get; set; }
     }
 }
