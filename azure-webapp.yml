@@ -21,7 +21,7 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: 'CMP Deployment'
+  azureSubscription: 'CMP Sandbox'
 
   # Function app name
   webAppName: 'webcmp'
