@@ -1,5 +1,4 @@
 ﻿using CMP.Core.Models;
-
 using CMP.Infrastructure.CosmosDb;
 using CMP.Infrastructure.Git;
 using CMP.Infrastructure.Storage;
@@ -24,7 +23,7 @@ namespace CMP.Functions
         }
 
         public override void Configure(IFunctionsHostBuilder builder)
-        {
+        {            
             builder.Services.AddOptions<GitRepoOptions>().Configure<IConfiguration>((settings, configuration) =>
             {
                 configuration.GetSection(GitRepoOptions.SectionName).Bind(settings);

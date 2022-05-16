@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Azure.Core;
+using Azure.Identity;
 using CMP.Core.Models;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -22,10 +20,15 @@ namespace CMP.Infrastructure.CosmosDb
             ILogger<CosmosDbRepository<T>> logger
             )
         {
-            this._logger = logger;
-            this._options = options.Value;
-            var dbClient = new CosmosClient(options.Value.Account, options.Value.Key);
-            this._container = dbClient.GetContainer(options.Value.DatabaseName, options.Value.ContainerName);
+            _logger = logger;
+            _options = options.Value;
+
+            var cred = new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions { ExcludeInteractiveBrowserCredential = true });
+            
+            var dbClient = new CosmosClient(
+                options.Value.Account, cred);            
+            _container = dbClient.GetContainer(options.Value.DatabaseName, options.Value.ContainerName);
         }
 
         public async Task<T> AddAsync(T entity)

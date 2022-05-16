@@ -13,22 +13,16 @@ namespace CMP.Web.Controllers
     public class DeploymentTemplateController : Controller
     {
         private readonly ILogger<DeploymentTemplateController> _logger;
-        private readonly GitRepoOptions _options;
-        private readonly IGitRepoRepository _gitRepositoryService;
         private readonly ICosmosDbRepository<DeploymentTemplate> _cosmosDbRepositoryService;
         private readonly ISearchService<DeploymentTemplateSearchResult> _searchService;
         
 
         public DeploymentTemplateController(
             ILogger<DeploymentTemplateController> logger,
-            IOptions<GitRepoOptions> options,
-            IGitRepoRepository gitRepositoryService,
             ICosmosDbRepository<DeploymentTemplate> cosmosDbRepositoryService,
             ISearchService<DeploymentTemplateSearchResult> searchService)            
         {
             _logger = logger;
-            _options = options.Value;
-            _gitRepositoryService = gitRepositoryService;
             _cosmosDbRepositoryService = cosmosDbRepositoryService;
             _searchService = searchService;
         }

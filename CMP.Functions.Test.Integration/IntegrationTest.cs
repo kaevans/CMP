@@ -10,6 +10,7 @@ using System.Dynamic;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Moq;
+using Azure.Identity;
 
 namespace CMP.Functions.Test.Integration
 {
@@ -40,8 +41,10 @@ namespace CMP.Functions.Test.Integration
             CosmosOptions = serviceProvider.GetRequiredService<IOptions<CosmosDbOptions>>();
             BlobStorageOptions = serviceProvider.GetRequiredService<IOptions<AzureBlobStorageOptions>>();
 
+            var cred = new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions { ExcludeInteractiveBrowserCredential = true });
 
-            var client = new Microsoft.Azure.Cosmos.CosmosClient(CosmosOptions.Value.Account, CosmosOptions.Value.Key);
+            var client = new Microsoft.Azure.Cosmos.CosmosClient(CosmosOptions.Value.Account, cred);
             var database = client.CreateDatabaseIfNotExistsAsync(CosmosOptions.Value.DatabaseName).GetAwaiter().GetResult();
             database.Database.CreateContainerIfNotExistsAsync(CosmosOptions.Value.ContainerName, "/id").GetAwaiter().GetResult();
         }

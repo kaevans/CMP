@@ -3,16 +3,16 @@
     "secrets1": {
       "type": "secrets.user"
     },
-    "appInsights1": {
-      "secretStore": "LocalSecretsFile",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/microsoft.insights/components/repoevents",
-      "type": "appInsights.azure",
-      "connectionId": "APPLICATIONINSIGHTS_CONNECTION_STRING"
-    },
     "identityapp1": {
       "secretStore": "LocalSecretsFile",
       "type": "identityapp.secretStore",
       "connectionId": "AzureAD:ClientSecret"
+    },
+    "appInsights1": {
+      "secretStore": "LocalSecretsFile",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/microsoft.insights/components/aicmp",
+      "type": "appInsights.azure",
+      "connectionId": "APPLICATIONINSIGHTS_CONNECTION_STRING"
     }
   }
 }

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Microsoft.Extensions.Configuration;
 
 namespace CMP.Web
 {
@@ -24,12 +25,8 @@ namespace CMP.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string[] initialScopes = Configuration.GetValue<string>("DownstreamApi:Scopes")?.Split(' ');
-
             services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"))
-                .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)                
-                .AddInMemoryTokenCaches();
+                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"));
 
             services.AddAuthorization(options =>
             {
@@ -37,27 +34,13 @@ namespace CMP.Web
                 options.FallbackPolicy = options.DefaultPolicy;
             });
 
-            services.AddApplicationInsightsTelemetry(Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
-
-            services.AddOptions<GitRepoOptions>().Configure<IConfiguration>((settings, configuration) =>
-            {
-                configuration.GetSection(GitRepoOptions.SectionName).Bind(settings);
-            });
-            services.AddSingleton<IGitRepoRepository, ADORepoRepository>();
+            services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsights:ConnectionString"]);
 
             services.AddOptions<CosmosDbOptions>().Configure<IConfiguration>((settings, configuration) =>
             {
                 configuration.GetSection(CosmosDbOptions.SectionName).Bind(settings);
             });
             services.AddSingleton<ICosmosDbRepository<DeploymentTemplate>, DeploymentTemplateRepository>();
-
-            /*
-            services.AddOptions<ResourceManagementOptions>().Configure<IConfiguration>((settings, configuration) =>
-            {
-                configuration.GetSection(ResourceManagementOptions.SectionName).Bind(settings);
-            });                  
-            services.AddHttpClient<IResourceManagementService, ResourceManagementService>();
-            */
 
             services.AddOptions<AzureSearchOptions>().Configure<IConfiguration>((settings, configuration) =>
             {

@@ -3,7 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <UserSecretsId>47c1dc54-67e8-4418-b998-2c3f1462362c</UserSecretsId>
-    <ApplicationInsightsResourceId>/subscriptions/d43f9b10-9c66-43f8-a701-afc0ad123cfd/resourceGroups/rg-cmp/providers/microsoft.insights/components/repoevents</ApplicationInsightsResourceId>
+    <ApplicationInsightsResourceId>/subscriptions/d43f9b10-9c66-43f8-a701-afc0ad123cfd/resourceGroups/rg-cmp/providers/microsoft.insights/components/aicmp</ApplicationInsightsResourceId>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Services\**" />
@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.6.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.15.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />

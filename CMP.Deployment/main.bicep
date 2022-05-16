@@ -22,8 +22,6 @@ param clientSecret string
 @description('Azure AD domain used for authentication')
 param domain string = 'cmpgitops.onmicrosoft.com'
 
-
-
 @description('Personal Access Token from Azure DevOps, used to read repos and items within repos for a given project')
 @secure()
 param azureDevOpsPersonalAccessToken string
@@ -40,15 +38,19 @@ var containerName = 'DeploymentTemplates'
 var dashboardName = '${name}-dashboard'
 var functionWorkerRuntime = 'dotnet'
 
-var configManagementURL = 'https://login.microsoftonline.com/'
+var configManagementURL = environment().authentication.loginEndpoint
 var configCosmosDBURL = 'https://${accountName}.documents.azure.com:443/'
 var configSearchURL = 'https://${searchName}.search.windows.net'
 var configDevOpsURL = 'https://dev.azure.com/{0}'
 var configDevOpsProject = 'CMP'
 var configDevOpsOrganization = 'CMPGitOps'
 var configDevOpsRepository = 'CloudDeploy'
-var configMetadataFileName ='metadata.json'
-var configSearchIndexName='cosmosdb-index'
+var configMetadataFileName = 'metadata.json'
+var configSearchIndexName = 'cosmosdb-index'
+
+var cosmosDBDataReader = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.DocumentDB/databaseAccounts/${accountName}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000001'
+var cosmosDBDataContributor = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.DocumentDB/databaseAccounts/${accountName}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002'
+var azureSearchIndexDataReader = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/1407120a-92aa-4202-b7e9-c0e197c71c8f'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   name: storageAccountName
@@ -75,10 +77,10 @@ resource account 'Microsoft.DocumentDB/databaseAccounts@2021-03-15' = {
         failoverPriority: 0
       }
     ]
-    databaseAccountOfferType: 'Standard'    
+    databaseAccountOfferType: 'Standard'
     enableAutomaticFailover: true
     capabilities: [
-      {        
+      {
         name: 'EnableServerless'
       }
     ]
@@ -95,7 +97,7 @@ resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2021-06-15
   }
 }
 
-resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2021-06-15' = {  
+resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2021-06-15' = {
   name: '${database.name}/${containerName}'
   properties: {
     resource: {
@@ -131,9 +133,6 @@ resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/container
   }
 }
 
-
-
-
 resource hostingPlan 'Microsoft.Web/serverfarms@2021-03-01' = {
   name: hostingPlanName
   location: location
@@ -150,7 +149,7 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
   kind: 'functionapp'
   identity: {
     type: 'SystemAssigned'
-  }  
+  }
   properties: {
     serverFarmId: hostingPlan.id
     siteConfig: {
@@ -178,6 +177,10 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
           value: applicationInsights.properties.InstrumentationKey
+        }
+        {
+          name: 'ApplicationInsights:ConnectionString'
+          value: applicationInsights.properties.ConnectionString
         }
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
@@ -220,10 +223,6 @@ resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
           value: containerName
         }
         {
-          name: 'CosmosDb:Key'
-          value: account.listKeys().primaryMasterKey
-        }
-        {
           name: 'Schedule'
           value: '*/10 * * * * *'
         }
@@ -246,20 +245,19 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 resource search 'Microsoft.Search/searchServices@2021-04-01-preview' = {
-  name:searchName
-  location:location
-  sku:{
-    name:'standard'
+  name: searchName
+  location: location
+  sku: {
+    name: 'basic'
   }
-  properties:{
-    replicaCount:1
-    partitionCount:1
-    hostingMode:'default'
-    disableLocalAuth:false
-    authOptions:{
-      apiKeyOnly:{}
-    }
-    semanticSearch:'disabled'
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    replicaCount: 1
+    partitionCount: 1
+    hostingMode: 'default'
+    semanticSearch: 'disabled'
   }
 }
 
@@ -272,15 +270,14 @@ resource webHostingPlan 'Microsoft.Web/serverfarms@2020-12-01' = {
   }
 }
 
-
 resource web 'Microsoft.Web/sites@2018-11-01' = {
   name: webAppName
   location: location
   tags: {
     'hidden-related:${resourceGroup().id}/providers/Microsoft.Web/serverfarms/appServicePlan': 'Resource'
   }
-  identity:{
-    type:'SystemAssigned'
+  identity: {
+    type: 'SystemAssigned'
   }
   properties: {
     serverFarmId: webHostingPlan.id
@@ -297,6 +294,10 @@ resource web 'Microsoft.Web/sites@2018-11-01' = {
         {
           name: 'WEBSITE_NODE_DEFAULT_VERSION'
           value: '~10'
+        }
+        {
+          name: 'ApplicationInsights:ConnectionString'
+          value: applicationInsights.properties.ConnectionString
         }
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
@@ -339,70 +340,53 @@ resource web 'Microsoft.Web/sites@2018-11-01' = {
           value: containerName
         }
         {
-          name: 'CosmosDb:Key'
-          value: account.listKeys().primaryMasterKey
+          name: 'AzureAd:Instance'
+          value: configManagementURL
         }
         {
-          name: 'Azure:APIVersion'
-          value: account.listKeys().primaryMasterKey
-        }        
-        {
-          name: 'Azure:APIEndpoint'
-          value: account.listKeys().primaryMasterKey
-        }        
-        {
-          name: 'Azure:TenantId'
-          value: account.listKeys().primaryMasterKey
+          name: 'AzureAd:Domain'
+          value: domain
         }
         {
-          name:'AzureAd:Instance'
-          value:configManagementURL
+          name: 'AzureAd:TenantId'
+          value: tenant().tenantId
         }
         {
-          name:'AzureAd:Domain'
-          value:domain
+          name: 'AzureAd:ClientId'
+          value: clientId
         }
         {
-          name:'AzureAd:TenantId'
-          value:tenant().tenantId
+          name: 'AzureAd:ClientSecret'
+          value: clientSecret
         }
         {
-          name:'AzureAd:ClientId'
-          value:clientId
+          name: 'AzureAd:Scopes'
+          value: 'access_as_user'
         }
         {
-          name:'AzureAd:ClientSecret'
-          value:clientSecret
+          name: 'AzureAd:CallbackPath'
+          value: '/signin-oidc'
         }
         {
-          name:'AzureAd:Scopes'
-          value:'access_as_user'
+          name: 'AzureAd:SignedOutCallbackPath'
+          value: '/signout-callback-oidc'
         }
         {
-          name:'AzureAd:CallbackPath'
-          value:'/signin-oidc'
+          name: 'AzureSearch:SearchServiceUri'
+          value: configSearchURL
         }
         {
-          name:'AzureAd:SignedOutCallbackPath'
-          value:'/signout-callback-oidc'
+          name: 'AzureSearch:IndexName'
+          value: configSearchIndexName
         }
         {
-          name:'AzureSearch:SearchServiceUri'
-          value:configSearchURL
-        }
-        {
-          name:'AzureSearch:SearchServiceQueryApiKey'
-          value:search.listQueryKeys('2021-04-01-preview').value[0].key
-        }
-        {
-          name:'AzureSearch:IndexName'
-          value:configSearchIndexName
+          name: 'AzureSearch:SearchServiceQueryApiKey'
+          value: search.listQueryKeys('2021-04-01-preview').value[0].key
         }
       ]
       ftpsState: 'FtpsOnly'
       minTlsVersion: '1.2'
     }
-
   }
 }
 
@@ -1616,3 +1600,41 @@ resource repoevents_Dashboard 'Microsoft.Portal/dashboards@2015-08-01-preview' =
     }
   }
 }
+
+resource webAppDataReaderToCosmos 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2021-06-15' = {
+  name: '${accountName}/${guid(cosmosDBDataReader, web.id, account.id)}'
+  properties: {
+    roleDefinitionId: cosmosDBDataReader
+    principalId: web.identity.principalId
+    scope: account.id
+  }
+}
+
+resource functionAppDataContributorToCosmos 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2021-06-15' = {
+  name: '${accountName}/${guid(cosmosDBDataContributor, functionApp.id, account.id)}'
+  properties: {
+    roleDefinitionId: cosmosDBDataContributor
+    principalId: functionApp.identity.principalId
+    scope: account.id
+  }
+}
+
+resource searchDataReaderToCosmos 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2021-06-15' = {
+  name: '${accountName}/${guid(cosmosDBDataReader, search.id, account.id)}'
+  properties: {
+    roleDefinitionId: cosmosDBDataReader
+    principalId: search.identity.principalId
+    scope: account.id
+  }
+}
+
+/*
+resource webAppDataReaderToSearch 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  name: guid(azureSearchIndexDataReader, search.id, web.id)
+  scope: search
+  properties: {
+    roleDefinitionId: azureSearchIndexDataReader
+    principalId: web.identity.principalId
+  }
+}
+*/

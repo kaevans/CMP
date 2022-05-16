@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.5.6.12127",
-      "templateHash": "7316142329921642867"
+      "templateHash": "10196467161852982188"
     }
   },
   "parameters": {
@@ -74,7 +74,7 @@
     "containerName": "DeploymentTemplates",
     "dashboardName": "[format('{0}-dashboard', parameters('name'))]",
     "functionWorkerRuntime": "dotnet",
-    "configManagementURL": "https://login.microsoftonline.com/",
+    "configManagementURL": "[environment().authentication.loginEndpoint]",
     "configCosmosDBURL": "[format('https://{0}.documents.azure.com:443/', variables('accountName'))]",
     "configSearchURL": "[format('https://{0}.search.windows.net', variables('searchName'))]",
     "configDevOpsURL": "https://dev.azure.com/{0}",
@@ -82,7 +82,9 @@
     "configDevOpsOrganization": "CMPGitOps",
     "configDevOpsRepository": "CloudDeploy",
     "configMetadataFileName": "metadata.json",
-    "configSearchIndexName": "cosmosdb-index"
+    "configSearchIndexName": "cosmosdb-index",
+    "cosmosDBDataReader": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000001', subscription().subscriptionId, resourceGroup().name, variables('accountName'))]",
+    "cosmosDBDataContributor": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002', subscription().subscriptionId, resourceGroup().name, variables('accountName'))]"
   },
   "resources": [
     {
@@ -265,10 +267,6 @@
               "value": "[variables('containerName')]"
             },
             {
-              "name": "CosmosDb:Key",
-              "value": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2021-03-15').primaryMasterKey]"
-            },
-            {
               "name": "Schedule",
               "value": "*/10 * * * * *"
             }
@@ -279,7 +277,6 @@
         "httpsOnly": true
       },
       "dependsOn": [
-        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]",
         "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
@@ -302,16 +299,15 @@
       "name": "[variables('searchName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "standard"
+        "name": "basic"
+      },
+      "identity": {
+        "type": "SystemAssigned"
       },
       "properties": {
         "replicaCount": 1,
         "partitionCount": 1,
         "hostingMode": "default",
-        "disableLocalAuth": false,
-        "authOptions": {
-          "apiKeyOnly": {}
-        },
         "semanticSearch": "disabled"
       }
     },
@@ -393,10 +389,6 @@
               "value": "[variables('containerName')]"
             },
             {
-              "name": "CosmosDb:Key",
-              "value": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2021-03-15').primaryMasterKey]"
-            },
-            {
               "name": "Azure:APIVersion",
               "value": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2021-03-15').primaryMasterKey]"
             },
@@ -418,7 +410,7 @@
             },
             {
               "name": "AzureAd:TenantId",
-              "value": "[environment().authentication.tenant]"
+              "value": "[tenant().tenantId]"
             },
             {
               "name": "AzureAd:ClientId",
@@ -1678,6 +1670,48 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments",
+      "apiVersion": "2021-06-15",
+      "name": "[format('{0}/{1}', variables('accountName'), guid(variables('cosmosDBDataReader'), resourceId('Microsoft.Web/sites', variables('webAppName')), resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))))]",
+      "properties": {
+        "roleDefinitionId": "[variables('cosmosDBDataReader')]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2018-11-01', 'full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments",
+      "apiVersion": "2021-06-15",
+      "name": "[format('{0}/{1}', variables('accountName'), guid(variables('cosmosDBDataContributor'), resourceId('Microsoft.Web/sites', variables('functionAppName')), resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))))]",
+      "properties": {
+        "roleDefinitionId": "[variables('cosmosDBDataContributor')]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2021-03-01', 'full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments",
+      "apiVersion": "2021-06-15",
+      "name": "[format('{0}/{1}', variables('accountName'), guid(variables('cosmosDBDataReader'), resourceId('Microsoft.Search/searchServices', variables('searchName')), resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))))]",
+      "properties": {
+        "roleDefinitionId": "[variables('cosmosDBDataReader')]",
+        "principalId": "[reference(resourceId('Microsoft.Search/searchServices', variables('searchName')), '2021-04-01-preview', 'full').identity.principalId]",
+        "scope": "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]",
+        "[resourceId('Microsoft.Search/searchServices', variables('searchName'))]"
       ]
     }
   ]
