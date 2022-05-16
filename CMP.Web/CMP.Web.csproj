@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>b13b6899-a07f-4da0-97c6-c550679c8971</UserSecretsId>
-    <ApplicationInsightsResourceId>/subscriptions/d43f9b10-9c66-43f8-a701-afc0ad123cfd/resourceGroups/rg-cmp/providers/microsoft.insights/components/repoevents</ApplicationInsightsResourceId>
+    <ApplicationInsightsResourceId>/subscriptions/d43f9b10-9c66-43f8-a701-afc0ad123cfd/resourceGroups/rg-cmp/providers/microsoft.insights/components/aicmp</ApplicationInsightsResourceId>
   </PropertyGroup>
 
   <ItemGroup>

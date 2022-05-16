@@ -15,15 +15,14 @@ using CMP.Infrastructure.Search;
 using CMP.Web.Services;
 using CMP.Core.Models;
 using CMP.Web.Models;
+using Azure.Identity;
 
 namespace CMP.Web.Tests.Integration
 {
     [TestClass]
     public class DeploymentControllerIntegrationTest
     {
-        private static IOptions<GitRepoOptions> GitRepoOptions { get; set; }
         private static IOptions<CosmosDbOptions> CosmosOptions { get; set; }
-        private static IOptions<AzureBlobStorageOptions> BlobStorageOptions { get; set; }
         private static IOptions<AzureSearchOptions> SearchOptions { get; set; }
 
         [ClassInitialize]
@@ -34,21 +33,19 @@ namespace CMP.Web.Tests.Integration
             // IOption configuration injection
             services.AddOptions();
 
-            var configurationRoot = TestingHelper.GetIConfigurationRoot(testContext.DeploymentDirectory);
-            services.Configure<GitRepoOptions>(configurationRoot.GetSection(Infrastructure.Git.GitRepoOptions.SectionName));
-            services.Configure<CosmosDbOptions>(configurationRoot.GetSection(CosmosDbOptions.SectionName));
-            services.Configure<AzureBlobStorageOptions>(configurationRoot.GetSection(AzureBlobStorageOptions.SectionName));
+            var configurationRoot = TestingHelper.GetIConfigurationRoot(testContext.DeploymentDirectory);            
+            services.Configure<CosmosDbOptions>(configurationRoot.GetSection(CosmosDbOptions.SectionName));            
             services.Configure<AzureSearchOptions>(configurationRoot.GetSection(AzureSearchOptions.SectionName));
 
             var serviceProvider = services.BuildServiceProvider();
 
-            // to use (or store in )
-            GitRepoOptions = serviceProvider.GetRequiredService<IOptions<GitRepoOptions>>();
-            CosmosOptions = serviceProvider.GetRequiredService<IOptions<CosmosDbOptions>>();
-            BlobStorageOptions = serviceProvider.GetRequiredService<IOptions<AzureBlobStorageOptions>>();
+            // to use (or store in )            
+            CosmosOptions = serviceProvider.GetRequiredService<IOptions<CosmosDbOptions>>();            
             SearchOptions = serviceProvider.GetRequiredService<IOptions<AzureSearchOptions>>();
 
-            var client = new Microsoft.Azure.Cosmos.CosmosClient(CosmosOptions.Value.Account, CosmosOptions.Value.Key);
+            var cred = new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions { ExcludeInteractiveBrowserCredential = true });
+            var client = new Microsoft.Azure.Cosmos.CosmosClient(CosmosOptions.Value.Account, cred);
             var database = client.CreateDatabaseIfNotExistsAsync(CosmosOptions.Value.DatabaseName).GetAwaiter().GetResult();
             database.Database.CreateContainerIfNotExistsAsync(CosmosOptions.Value.ContainerName, "/id").GetAwaiter().GetResult();
         }
@@ -58,18 +55,12 @@ namespace CMP.Web.Tests.Integration
             var mockCosmosLogger = TestingHelper.GetLogger<DeploymentTemplateRepository>();
             var cosmosService = new DeploymentTemplateRepository(CosmosOptions, mockCosmosLogger.Object);
 
-            var mockGitLogger = TestingHelper.GetLogger<ADORepoRepository>();
-            var gitService = new ADORepoRepository(GitRepoOptions, mockGitLogger.Object);            
-
-            var mockStorageLogger = TestingHelper.GetLogger<AzureBlobStorageRepository>();
-            var storageService = new AzureBlobStorageRepository(BlobStorageOptions, mockStorageLogger.Object);
-
             var mockSearchLogger = TestingHelper.GetLogger<DeploymentTemplateSearchService>();
             var searchService = new DeploymentTemplateSearchService(SearchOptions, mockSearchLogger.Object);
 
             var mockControllerLogger = TestingHelper.GetLogger<DeploymentTemplateController>();
 
-            var controller = new DeploymentTemplateController(mockControllerLogger.Object, GitRepoOptions, gitService, cosmosService, searchService);
+            var controller = new DeploymentTemplateController(mockControllerLogger.Object, cosmosService, searchService);
             var result = controller.Index().GetAwaiter().GetResult();
 
             Assert.IsInstanceOfType(result, typeof(ViewResult));
@@ -86,16 +77,14 @@ namespace CMP.Web.Tests.Integration
         {
             var mockCosmosLogger = TestingHelper.GetLogger<DeploymentTemplateRepository>();
             var cosmosService = new DeploymentTemplateRepository(CosmosOptions, mockCosmosLogger.Object);
-
-            var mockGitLogger = TestingHelper.GetLogger<ADORepoRepository>();
-            var gitService = new ADORepoRepository(GitRepoOptions, mockGitLogger.Object);            
+          
 
             var mockSearchLogger = TestingHelper.GetLogger<DeploymentTemplateSearchService>();
             var searchService = new DeploymentTemplateSearchService(SearchOptions, mockSearchLogger.Object);
 
             var mockControllerLogger = TestingHelper.GetLogger<DeploymentTemplateController>();
 
-            var controller = new DeploymentTemplateController(mockControllerLogger.Object, GitRepoOptions, gitService, cosmosService, searchService);
+            var controller = new DeploymentTemplateController(mockControllerLogger.Object, cosmosService, searchService);
             var model = new SearchData { SearchText = "" };
             var result = controller.Search(model).GetAwaiter().GetResult();
 
@@ -113,17 +102,14 @@ namespace CMP.Web.Tests.Integration
         public void GetByIdExecutesWithoutException()
         {
             var mockCosmosLogger = TestingHelper.GetLogger<DeploymentTemplateRepository>();
-            var cosmosService = new DeploymentTemplateRepository(CosmosOptions, mockCosmosLogger.Object);
-
-            var mockGitLogger = TestingHelper.GetLogger<ADORepoRepository>();
-            var gitService = new ADORepoRepository(GitRepoOptions, mockGitLogger.Object);            
+            var cosmosService = new DeploymentTemplateRepository(CosmosOptions, mockCosmosLogger.Object);         
 
             var mockSearchLogger = TestingHelper.GetLogger<DeploymentTemplateSearchService>();
             var searchService = new DeploymentTemplateSearchService(SearchOptions, mockSearchLogger.Object);
 
             var mockControllerLogger = TestingHelper.GetLogger<DeploymentTemplateController>();
 
-            var controller = new DeploymentTemplateController(mockControllerLogger.Object, GitRepoOptions, gitService, cosmosService, searchService);
+            var controller = new DeploymentTemplateController(mockControllerLogger.Object, cosmosService, searchService);
 
             //Get an item we know exists
             var allItems = cosmosService.GetItemsAsync().GetAwaiter().GetResult();

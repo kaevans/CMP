@@ -39,15 +39,8 @@ namespace CMP.Infrastructure.Storage
 
             var blobUri = GetBlobUri(id);
 
-            TokenCredential cred = null;
-            if(_azureBlobStorageOptions.IsDevelopment())
-            {
-                cred = new VisualStudioCredential();
-            }
-            else
-            {
-                cred = new ManagedIdentityCredential();
-            }            
+            var cred = new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions { ExcludeInteractiveBrowserCredential = true });
             var blobClient = new BlobClient(blobUri, cred);
 
 
@@ -86,7 +79,11 @@ namespace CMP.Infrastructure.Storage
             string message = "Blob failed to delete";
 
             var blobUri = GetBlobUri(id);
-            var blobClient = new BlobClient(blobUri, new DefaultAzureCredential());
+
+            var cred = new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions { ExcludeInteractiveBrowserCredential = true });
+
+            var blobClient = new BlobClient(blobUri, cred);
 
             try
             {
@@ -125,7 +122,9 @@ namespace CMP.Infrastructure.Storage
             string message = "Failed to get Blob";
 
             var blobUri = GetBlobUri(id);
-            var blobClient = new BlobClient(blobUri, new DefaultAzureCredential());
+            var cred = new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions { ExcludeInteractiveBrowserCredential = true });
+            var blobClient = new BlobClient(blobUri, cred);
 
             var stream = new MemoryStream();
             try
@@ -177,16 +176,9 @@ namespace CMP.Infrastructure.Storage
 
             var blobUri = GetBlobUri(id);
 
-            TokenCredential cred = default;
-            if (_azureBlobStorageOptions.IsDevelopment())
-            {
-                cred = new VisualStudioCredential();
-            }
-            else
-            {
-                cred = new ManagedIdentityCredential();
-            }
-                        
+            var cred = new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions { ExcludeInteractiveBrowserCredential = true });
+
             try
             {
                 var blobServiceClient = new BlobServiceClient(new Uri(_azureBlobStorageOptions.BlobServiceEndpoint), cred);

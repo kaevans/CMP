@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Azure.Identity;
 
 namespace CMP.Infrastructure.Tests.Integration
 {
@@ -37,8 +37,9 @@ namespace CMP.Infrastructure.Tests.Integration
             GitRepoOptions = serviceProvider.GetRequiredService<IOptions<GitRepoOptions>>();
             CosmosOptions = serviceProvider.GetRequiredService<IOptions<CosmosDbOptions>>();
 
-
-            var client = new Microsoft.Azure.Cosmos.CosmosClient(CosmosOptions.Value.Account, CosmosOptions.Value.Key);
+            var cred = new DefaultAzureCredential(
+                    new DefaultAzureCredentialOptions { ExcludeInteractiveBrowserCredential = true });
+            var client = new Microsoft.Azure.Cosmos.CosmosClient(CosmosOptions.Value.Account, cred);
             var database = client.CreateDatabaseIfNotExistsAsync(CosmosOptions.Value.DatabaseName).GetAwaiter().GetResult();
             database.Database.CreateContainerIfNotExistsAsync(CosmosOptions.Value.ContainerName, "/id").GetAwaiter().GetResult();
         }

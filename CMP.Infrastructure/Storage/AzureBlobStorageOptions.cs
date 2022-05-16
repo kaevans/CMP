@@ -10,10 +10,5 @@ namespace CMP.Infrastructure.Storage
 
         public string Container { get; set; }
 
-        public bool IsDevelopment()
-        {
-            return Debugger.IsAttached;
-        }
-
     }
 }

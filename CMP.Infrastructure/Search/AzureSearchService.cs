@@ -19,8 +19,12 @@ namespace CMP.Infrastructure.Search
         {
             _azureSearchOptions = azureSearchOptions.Value;
             _logger = logger;
+            
 
-            _indexClient = new SearchIndexClient(new Uri(_azureSearchOptions.SearchServiceUri), new AzureKeyCredential(_azureSearchOptions.SearchServiceQueryApiKey));
+            _indexClient = new SearchIndexClient(
+                new Uri(_azureSearchOptions.SearchServiceUri), 
+                new AzureKeyCredential(_azureSearchOptions.SearchServiceQueryApiKey));
+
             _searchClient = _indexClient.GetSearchClient(_azureSearchOptions.IndexName);
         }
 
