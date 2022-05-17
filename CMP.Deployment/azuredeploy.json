@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.5.6.12127",
-      "templateHash": "10196467161852982188"
+      "templateHash": "18385221307889206813"
     }
   },
   "parameters": {
@@ -84,7 +84,8 @@
     "configMetadataFileName": "metadata.json",
     "configSearchIndexName": "cosmosdb-index",
     "cosmosDBDataReader": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000001', subscription().subscriptionId, resourceGroup().name, variables('accountName'))]",
-    "cosmosDBDataContributor": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002', subscription().subscriptionId, resourceGroup().name, variables('accountName'))]"
+    "cosmosDBDataContributor": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002', subscription().subscriptionId, resourceGroup().name, variables('accountName'))]",
+    "azureSearchIndexDataReader": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/1407120a-92aa-4202-b7e9-c0e197c71c8f', subscription().subscriptionId)]"
   },
   "resources": [
     {
@@ -227,6 +228,10 @@
               "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))).InstrumentationKey]"
             },
             {
+              "name": "ApplicationInsights:ConnectionString",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))).ConnectionString]"
+            },
+            {
               "name": "FUNCTIONS_WORKER_RUNTIME",
               "value": "[variables('functionWorkerRuntime')]"
             },
@@ -349,6 +354,10 @@
               "value": "~10"
             },
             {
+              "name": "ApplicationInsights:ConnectionString",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))).ConnectionString]"
+            },
+            {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))).InstrumentationKey]"
             },
@@ -389,18 +398,6 @@
               "value": "[variables('containerName')]"
             },
             {
-              "name": "Azure:APIVersion",
-              "value": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2021-03-15').primaryMasterKey]"
-            },
-            {
-              "name": "Azure:APIEndpoint",
-              "value": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2021-03-15').primaryMasterKey]"
-            },
-            {
-              "name": "Azure:TenantId",
-              "value": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName')), '2021-03-15').primaryMasterKey]"
-            },
-            {
               "name": "AzureAd:Instance",
               "value": "[variables('configManagementURL')]"
             },
@@ -437,12 +434,12 @@
               "value": "[variables('configSearchURL')]"
             },
             {
-              "name": "AzureSearch:SearchServiceQueryApiKey",
-              "value": "[listQueryKeys(resourceId('Microsoft.Search/searchServices', variables('searchName')), '2021-04-01-preview').value[0].key]"
-            },
-            {
               "name": "AzureSearch:IndexName",
               "value": "[variables('configSearchIndexName')]"
+            },
+            {
+              "name": "AzureSearch:SearchServiceQueryApiKey",
+              "value": "[listQueryKeys(resourceId('Microsoft.Search/searchServices', variables('searchName')), '2021-04-01-preview').value[0].key]"
             }
           ],
           "ftpsState": "FtpsOnly",
@@ -450,7 +447,6 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]",
         "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Search/searchServices', variables('searchName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
