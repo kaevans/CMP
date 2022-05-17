@@ -17,7 +17,7 @@
     "clientSecret": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/d43f9b10-9c66-43f8-a701-afc0ad123cfd/resourceGroups/rg-cmp/providers/Microsoft.KeyVault/vaults/kv-cmp"
+          "id": "/subscriptions/0121d92d-c5fc-4b15-ab46-786abe7680b4/resourceGroups/rg-cmp/providers/Microsoft.KeyVault/vaults/kv-cmpdeploy"
         },
         "secretName": "azureADClientSecret"
       }
@@ -28,7 +28,7 @@
     "azureDevOpsPersonalAccessToken": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/d43f9b10-9c66-43f8-a701-afc0ad123cfd/resourceGroups/rg-cmp/providers/Microsoft.KeyVault/vaults/kv-cmp"
+          "id": "/subscriptions/0121d92d-c5fc-4b15-ab46-786abe7680b4/resourceGroups/rg-cmp/providers/Microsoft.KeyVault/vaults/kv-cmpdeploy"
         },
         "secretName": "azureDevOpsPersonalAccessToken"
       }
