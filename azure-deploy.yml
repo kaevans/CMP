@@ -18,11 +18,11 @@ steps:
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
     deploymentScope: 'Resource Group'
-    azureResourceManagerConnection: 'CMP Deployment'
-    subscriptionId: 'd43f9b10-9c66-43f8-a701-afc0ad123cfd'
+    azureResourceManagerConnection: 'CMP Sandbox'
+    subscriptionId: '0121d92d-c5fc-4b15-ab46-786abe7680b4'
     action: 'Create Or Update Resource Group'
     resourceGroupName: 'rg-cmp'
-    location: 'South Central US'
+    location: 'East US'
     templateLocation: 'Linked artifact'
     csmFile: '$(System.DefaultWorkingDirectory)/CMP.Deployment/azuredeploy.json'
     csmParametersFile: '$(System.DefaultWorkingDirectory)/CMP.Deployment/azuredeploy.parameters.json'
