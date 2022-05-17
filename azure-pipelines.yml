@@ -1,0 +1,26 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+    - master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'CMP Sandbox'
+    subscriptionId: '0121d92d-c5fc-4b15-ab46-786abe7680b4'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'rg-cmp'
+    location: 'East US'
+    templateLocation: 'Linked artifact'
+    csmFile: '$(System.DefaultWorkingDirectory)/CMP.Deployment/azuredeploy.json'
+    csmParametersFile: '$(System.DefaultWorkingDirectory)/CMP.Deployment/azuredeploy.parameters.json'
+    deploymentMode: 'Incremental'
