@@ -1617,6 +1617,9 @@ resource functionAppDataContributorToCosmos 'Microsoft.DocumentDB/databaseAccoun
     principalId: functionApp.identity.principalId
     scope: account.id
   }
+  dependsOn:[
+    container
+  ]
 }
 
 resource searchDataReaderToCosmos 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2021-06-15' = {
@@ -1626,6 +1629,9 @@ resource searchDataReaderToCosmos 'Microsoft.DocumentDB/databaseAccounts/sqlRole
     principalId: search.identity.principalId
     scope: account.id
   }
+  dependsOn:[
+    container
+  ]
 }
 
 /*
