@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.5.6.12127",
-      "templateHash": "9324188022704125088"
+      "templateHash": "11321160504430846772"
     }
   },
   "parameters": {
@@ -84,8 +84,7 @@
     "configMetadataFileName": "metadata.json",
     "configSearchIndexName": "cosmosdb-index",
     "cosmosDBDataReader": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000001', subscription().subscriptionId, resourceGroup().name, variables('accountName'))]",
-    "cosmosDBDataContributor": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002', subscription().subscriptionId, resourceGroup().name, variables('accountName'))]",
-    "azureSearchIndexDataReader": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/1407120a-92aa-4202-b7e9-c0e197c71c8f', subscription().subscriptionId)]"
+    "cosmosDBDataContributor": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002', subscription().subscriptionId, resourceGroup().name, variables('accountName'))]"
   },
   "resources": [
     {
@@ -334,6 +333,7 @@
       "tags": {
         "[format('hidden-related:{0}/providers/Microsoft.Web/serverfarms/appServicePlan', resourceGroup().id)]": "Resource"
       },
+      "kind": "app",
       "identity": {
         "type": "SystemAssigned"
       },
@@ -341,18 +341,6 @@
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('webAppName'))]",
         "siteConfig": {
           "appSettings": [
-            {
-              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('storageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-08-01').keys[0].value)]"
-            },
-            {
-              "name": "WEBSITE_CONTENTSHARE",
-              "value": "[toLower(variables('webAppName'))]"
-            },
-            {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "~10"
-            },
             {
               "name": "ApplicationInsights:ConnectionString",
               "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))).ConnectionString]"
@@ -449,8 +437,21 @@
       "dependsOn": [
         "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]",
         "[resourceId('Microsoft.Search/searchServices', variables('searchName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
         "[resourceId('Microsoft.Web/serverfarms', variables('webAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2018-11-01",
+      "name": "[format('{0}/web', variables('webAppName'))]",
+      "properties": {
+        "numberOfWorkers": 1,
+        "netFrameworkVersion": "v6.0",
+        "logsDirectorySizeLimit": 35,
+        "minTlsVersion": "1.2"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
       ]
     },
     {

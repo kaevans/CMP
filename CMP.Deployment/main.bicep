@@ -50,7 +50,7 @@ var configSearchIndexName = 'cosmosdb-index'
 
 var cosmosDBDataReader = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.DocumentDB/databaseAccounts/${accountName}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000001'
 var cosmosDBDataContributor = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.DocumentDB/databaseAccounts/${accountName}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002'
-var azureSearchIndexDataReader = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/1407120a-92aa-4202-b7e9-c0e197c71c8f'
+//var azureSearchIndexDataReader = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/1407120a-92aa-4202-b7e9-c0e197c71c8f'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
   name: storageAccountName
@@ -276,6 +276,7 @@ resource web 'Microsoft.Web/sites@2018-11-01' = {
   tags: {
     'hidden-related:${resourceGroup().id}/providers/Microsoft.Web/serverfarms/appServicePlan': 'Resource'
   }
+  kind: 'app'
   identity: {
     type: 'SystemAssigned'
   }
@@ -283,18 +284,6 @@ resource web 'Microsoft.Web/sites@2018-11-01' = {
     serverFarmId: webHostingPlan.id
     siteConfig: {
       appSettings: [
-        {
-          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
-        }
-        {
-          name: 'WEBSITE_CONTENTSHARE'
-          value: toLower(webAppName)
-        }
-        {
-          name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '~10'
-        }
         {
           name: 'ApplicationInsights:ConnectionString'
           value: applicationInsights.properties.ConnectionString
@@ -390,6 +379,16 @@ resource web 'Microsoft.Web/sites@2018-11-01' = {
   }
 }
 
+resource webConfig 'Microsoft.Web/sites/config@2018-11-01' = {
+  name: '${web.name}/web'
+  properties: {
+    numberOfWorkers: 1
+    netFrameworkVersion: 'v6.0'
+    logsDirectorySizeLimit: 35
+    minTlsVersion: '1.2'
+  }
+
+}
 resource repoevents_Dashboard 'Microsoft.Portal/dashboards@2015-08-01-preview' = {
   name: dashboardName
   location: location
