@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.5.6.12127",
-      "templateHash": "18385221307889206813"
+      "templateHash": "9324188022704125088"
     }
   },
   "parameters": {
@@ -1693,6 +1693,7 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]",
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', split(format('{0}/{1}', format('{0}/{1}', variables('accountName'), variables('databaseName')), variables('containerName')), '/')[0], split(format('{0}/{1}', format('{0}/{1}', variables('accountName'), variables('databaseName')), variables('containerName')), '/')[1], split(format('{0}/{1}', format('{0}/{1}', variables('accountName'), variables('databaseName')), variables('containerName')), '/')[2])]",
         "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
       ]
     },
@@ -1707,6 +1708,7 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('accountName'))]",
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', split(format('{0}/{1}', format('{0}/{1}', variables('accountName'), variables('databaseName')), variables('containerName')), '/')[0], split(format('{0}/{1}', format('{0}/{1}', variables('accountName'), variables('databaseName')), variables('containerName')), '/')[1], split(format('{0}/{1}', format('{0}/{1}', variables('accountName'), variables('databaseName')), variables('containerName')), '/')[2])]",
         "[resourceId('Microsoft.Search/searchServices', variables('searchName'))]"
       ]
     }
