@@ -1,7 +1,7 @@
 #!/bin/bash
 
-RESOURCE_GROUP_NAME=tfstate
-STORAGE_ACCOUNT_NAME=tfstate$RANDOM
+RESOURCE_GROUP_NAME=CMP
+STORAGE_ACCOUNT_NAME=stcmptfstate
 CONTAINER_NAME=tfstate
 LOCATION=southcentralus
 
