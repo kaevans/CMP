@@ -1,4 +1,4 @@
-name: .NET
+name: deploy application
 defaults:
   run:
     working-directory: src/

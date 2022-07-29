@@ -1,4 +1,4 @@
-name: .NET
+name: validate application
 defaults:
   run:
     working-directory: src/
