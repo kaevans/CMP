@@ -24,6 +24,6 @@ steps:
     resourceGroupName: 'rg-cmp'
     location: 'East US'
     templateLocation: 'Linked artifact'
-    csmFile: '$(System.DefaultWorkingDirectory)/CMP.Deployment/azuredeploy.json'
-    csmParametersFile: '$(System.DefaultWorkingDirectory)/CMP.Deployment/azuredeploy.parameters.json'
+    csmFile: '$(System.DefaultWorkingDirectory)/src/CMP.Deployment/azuredeploy.json'
+    csmParametersFile: '$(System.DefaultWorkingDirectory)/src/CMP.Deployment/azuredeploy.parameters.json'
     deploymentMode: 'Incremental'

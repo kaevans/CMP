@@ -1,10 +1,14 @@
 name: .NET
-
+defaults:
+  run:
+    working-directory: src/
+    
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches: 
+    - "main"
+    paths:
+    - "src/**"
 
 jobs:
   build:
