@@ -8,6 +8,8 @@ resource "azurerm_linux_function_app" "default" {
   storage_account_name = azurerm_storage_account.default.name
   service_plan_id      = azurerm_service_plan.default.id
 
+  https_only = true
+
   site_config {}
 
 }

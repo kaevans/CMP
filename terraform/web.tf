@@ -4,5 +4,7 @@ resource "azurerm_linux_web_app" "default" {
   location            = azurerm_service_plan.default.location
   service_plan_id     = azurerm_service_plan.default.id
 
+  https_only = true
+
   site_config {}
 }
